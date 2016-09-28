@@ -4,8 +4,8 @@ from django.db import models
 
 
 PHONE_REGEX = RegexValidator(
-    regex=r'^+\b(639)\d{9}?\b$',
-    message='Phone number must be entered in the format: 639XXXXXXXXXX.')
+    regex=r'^\b(09)\d{9}?\b$',
+    message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 
 
 class Issue(models.Model):
@@ -15,7 +15,7 @@ class Issue(models.Model):
     created_by = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.reference_number
+        return '{} - {}'.format(self.reference_number, self.title)
 
 
 class Representative(models.Model):
@@ -35,4 +35,15 @@ class Representative(models.Model):
 
     def __str__(self):
         return '{}, {} {}'.format(self.last_name, self.first_name, self.middle_name)
+
+
+class Ticket(models.Model):
+    representative = models.ForeignKey(Representative, related_name='ticket_repr')
+    issue = models.ForeignKey(Issue, related_name='ticket_issue')
+    reference_number = models.CharField(max_length=200, unique=True)
+    remark = models.CharField(max_length=200)
+    note = models.TextField()
+
+    def __str__(self):
+        return '{} - {}'.format(self.reference_number, self.representative)
 
