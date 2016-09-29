@@ -38,10 +38,15 @@ class Representative(models.Model):
 
 
 class Ticket(models.Model):
+    REMARKS = (('LOW', 'Low'),
+               ('NORMAL', 'Normal'),
+               ('HIGH', 'High'),
+               ('EMERGENCY', 'Emergency'))
+
     representative = models.ForeignKey(Representative, related_name='ticket_repr')
     issue = models.ForeignKey(Issue, related_name='ticket_issue')
     reference_number = models.CharField(max_length=200, unique=True)
-    remark = models.CharField(max_length=200)
+    remark = models.CharField(max_length=200, choices=REMARKS, default='NORMAL')
     note = models.TextField()
 
     def __str__(self):
