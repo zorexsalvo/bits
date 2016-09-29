@@ -48,6 +48,8 @@ class Ticket(models.Model):
     reference_number = models.CharField(max_length=200, unique=True)
     remark = models.CharField(max_length=200, choices=REMARKS, default='NORMAL')
     note = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=200)
 
     def __str__(self):
         return '{} - {}'.format(self.reference_number, self.representative)
