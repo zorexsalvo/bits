@@ -47,3 +47,14 @@ class Ticket(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.reference_number, self.representative)
 
+
+class Repository(models.Model):
+    issue = models.ForeignKey(Issue, related_name='issue_repository')
+    ticket = models.ForeignKey(Ticket, related_name='ticket_repository')
+
+    class Meta:
+        verbose_name_plural = 'Repositories'
+
+    def __str__(self):
+        return self.issue
+
