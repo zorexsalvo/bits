@@ -6,8 +6,18 @@ from maintenance.models import User, Issue, Ticket
 class TicketInline(admin.StackedInline):
     extra = 0
     model = Ticket
-    fields = ('issue', 'remark', 'note')
-    readonly_fields = ('issue', 'remark', 'note')
+    fields = ('issue', 'remark', 'note', 'date_created', 'created_by')
+    readonly_fields = ('date_created', 'created_by')
+
+    def save_model(self, request, obj, form, change):
+        if getattr(obj, 'author', None) is None:
+            obj.created_by = request.user
+        obj.save()
+
+    def get_queryset(self, request):
+        qs = super(TicketInline, self).get_queryset(request)
+        qs = qs.order_by('-id')
+        return qs
 
 
 class IssueAdmin(admin.ModelAdmin):
