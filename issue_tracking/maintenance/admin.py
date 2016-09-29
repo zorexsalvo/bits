@@ -6,7 +6,7 @@ from maintenance.models import User, Issue, Ticket
 class TicketInline(admin.StackedInline):
     extra = 0
     model = Ticket
-    fields = ('issue', 'remark', 'note', 'date_created', 'created_by')
+    fields = ('assigned_to', 'issue', 'remark', 'note', 'date_created', 'created_by')
     readonly_fields = ('date_created', 'created_by')
 
     def save_model(self, request, obj, form, change):
