@@ -16,7 +16,7 @@ class TicketInline(admin.StackedInline):
 
     def get_queryset(self, request):
         qs = super(TicketInline, self).get_queryset(request)
-        qs = qs.order_by('-id')
+        qs = qs.order_by('id')
         return qs
 
 
@@ -34,7 +34,7 @@ class IssueAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(IssueAdmin, self).get_queryset(request)
-        qs = qs.order_by('-id')
+        qs = qs.order_by('id')
         return qs
 
 
@@ -63,7 +63,7 @@ class TicketAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(TicketAdmin, self).get_queryset(request)
-        qs = qs.order_by('-id')
+        qs = qs.order_by('id')
         return qs
 
 
