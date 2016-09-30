@@ -55,6 +55,7 @@ class TicketAdmin(admin.ModelAdmin):
     list_display = ('reference_id', 'issue', 'assigned_to', 'remark', 'created_by', 'date_created')
     fields = ('issue', 'assigned_to', 'remark', 'note', 'created_by', 'date_created')
     readonly_fields = ('date_created', 'created_by')
+    list_filter = ('remark',)
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'author', None) is None:
