@@ -6,7 +6,7 @@ from maintenance.models import User, Issue, Ticket
 class TicketInline(admin.StackedInline):
     extra = 0
     model = Ticket
-    fields = ('assigned_to', 'issue', 'remark', 'note', 'date_created', 'created_by')
+    fields = ('assigned_to', 'issue', 'priority', 'remark', 'note', 'date_created', 'created_by')
     readonly_fields = ('date_created', 'created_by')
 
     def save_model(self, request, obj, form, change):
@@ -51,11 +51,11 @@ class UserAdmin(admin.ModelAdmin):
 
 
 class TicketAdmin(admin.ModelAdmin):
-    search_fields = ('assigned_to', 'issue', 'reference_id', 'remark')
-    list_display = ('reference_id', 'issue', 'assigned_to', 'remark', 'created_by', 'date_created')
-    fields = ('issue', 'assigned_to', 'remark', 'note', 'created_by', 'date_created')
+    search_fields = ('assigned_to', 'issue', 'reference_id', 'priority', 'remark')
+    list_display = ('reference_id', 'issue', 'assigned_to', 'priority', 'remark', 'created_by', 'date_created')
+    fields = ('issue', 'assigned_to', 'priority', 'remark', 'note', 'created_by', 'date_created')
     readonly_fields = ('date_created', 'created_by')
-    list_filter = ('remark',)
+    list_filter = ('remark', 'priority')
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'author', None) is None:

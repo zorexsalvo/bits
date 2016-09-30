@@ -45,15 +45,19 @@ class User(models.Model):
 
 
 class Ticket(models.Model):
-    REMARKS = (('LOW', 'Low'),
-               ('NORMAL', 'Normal'),
-               ('HIGH', 'High'),
-               ('EMERGENCY', 'Emergency'))
+    PRIORITY = (('LOW', 'Low'),
+                ('NORMAL', 'Normal'),
+                ('HIGH', 'High'),
+                ('EMERGENCY', 'Emergency'))
+    REMARKS = (('OPEN', 'Open'),
+               ('RESOLVED', 'Resolved'),
+               ('CLOSED', 'Closed'))
 
     assigned_to = models.ForeignKey(User, related_name='ticket_repr')
     issue = models.ForeignKey(Issue, related_name='ticket_issue')
     reference_id = models.CharField(max_length=200, unique=True)
-    remark = models.CharField(max_length=200, choices=REMARKS, default='NORMAL')
+    priority = models.CharField(max_length=200, choices=PRIORITY, default='NORMAL')
+    remark = models.CharField(max_length=200, choices=REMARKS, default='OPEN')
     note = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
