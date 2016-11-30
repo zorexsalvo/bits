@@ -4,6 +4,12 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from . forms import *
 
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/login/')
+
+
 class LoginView(TemplateView):
     form_class = LoginForm
     template_name = 'security/login.html'
@@ -16,6 +22,8 @@ class LoginView(TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             user = form.login(request)
-            login(request, user)
+            _login = login(request, user)
+            print('=============')
+            print(_login)
             return HttpResponseRedirect('/')
         return render(request, self.template_name, {'form': form})
