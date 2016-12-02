@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from maintenance.models import User, Issue, Ticket
+from maintenance.models import User, Issue, Ticket, Company
 
 
 class TicketInline(admin.StackedInline):
@@ -69,6 +69,7 @@ class TicketAdmin(admin.ModelAdmin):
 
 
 admin.site.unregister(Group)
+admin.site.register(Company)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(User, UserAdmin)

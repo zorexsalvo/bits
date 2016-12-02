@@ -12,13 +12,23 @@ NAME_REGEX = RegexValidator(
 message='Invalid input.')
 
 
+class Company(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Companies'
+
+
 class Issue(models.Model):
     reference_id = models.CharField(max_length=200, unique=True, blank=True)
     title = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
 
-    def __str__(self):
+    def __unicode__(self):
         return '{0} - {1}'.format(self.reference_id, self.title)
 
     def save(self, *args, **kwargs):
@@ -40,7 +50,7 @@ class User(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
 
-    def __str__(self):
+    def __unicode__(self):
         return '{}, {} {}'.format(self.last_name, self.first_name, self.middle_name)
 
 
@@ -62,13 +72,12 @@ class Ticket(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
 
-    def __str__(self):
+    def __unicode__(self):
         return '{} - {}'.format(self.reference_id, self.assigned_to)
 
     def save(self, *args, **kwargs):
         super(Ticket, self).save(*args, **kwargs)
         Ticket.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
-
 
 
 class Repository(models.Model):
@@ -78,6 +87,5 @@ class Repository(models.Model):
     class Meta:
         verbose_name_plural = 'Repositories'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.issue
-

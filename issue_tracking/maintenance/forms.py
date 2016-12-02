@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from .models import *
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username','class': 'form-control'}))
@@ -23,3 +24,13 @@ class LoginForm(forms.Form):
     class Meta:
         model = User
         fields = ['username', 'password']
+
+
+class CreateCompanyForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter company name', 'class': 'form-control'}))
+
+    def clean(self):
+        data = self.cleaned_data['name']
+        if Company.objects.filter(name=data):
+            raise forms.ValidationError('Company already exists.')
+        return self.cleaned_data
