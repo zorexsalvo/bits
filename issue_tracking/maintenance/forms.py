@@ -1,3 +1,4 @@
+from datetime import date
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -34,3 +35,12 @@ class CreateCompanyForm(forms.Form):
         if Company.objects.filter(name=data):
             raise forms.ValidationError('Company already exists.')
         return self.cleaned_data
+
+
+class UserForm(forms.Form):
+    first_name = forms.CharField()
+    middle_name = forms.CharField()
+    last_name = forms.CharField()
+    date_of_birth = forms.DateField(initial=date.today)
+    sex = forms.ChoiceField()
+    mobile_number = forms.CharField()
