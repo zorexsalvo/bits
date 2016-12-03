@@ -64,6 +64,10 @@
                                             <label>Password</label>
                                             {{ form.password }}
                                         </div>
+                                        <div class="form-group">
+                                            <label>User Type</label>
+                                            {{ form.type }}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -110,6 +114,22 @@
                                     </div>
                                 </div>
 
+                                <div class="box box-solid">
+                                    <div class="box-header with-border">
+                                    <h4 class="box-title">Employement Details</h4>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label>Company</label>
+                                            {{ form.company }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Position</label>
+                                            {{ form.position }}
+                                        </div>
+                                    </div>
+                                </div>
+
 
 
                                 
@@ -124,7 +144,7 @@
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="myModalLabel">Create Company</h4>
+                                                <h4 class="modal-title" id="myModalLabel">Create Employee</h4>
                                             </div>
                                             <div class="modal-body">
                                                 {% if form.non_field_errors %}
@@ -132,7 +152,7 @@
                                                         {{ error }}
                                                     {% endfor %}
                                                 {% else %}
-                                                    Company has been created successfully.
+                                                    Employee has been created successfully.
                                                 {% endif %}
                                             </div>
                                             <div class="modal-footer">

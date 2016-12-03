@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .models import *
 
+
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username','class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password', 'class': 'form-control'}))
@@ -39,6 +40,10 @@ class CreateCompanyForm(forms.Form):
 
 class UserForm(forms.Form):
     SEX = (('MALE', 'Male',), ('FEMALE', 'Female',))
+    COMPANY = ()
+    COMPANY += tuple((company.id, company.name) for company in Company.objects.all())
+    TYPE = (('ADMIN', 'Admin'),
+            ('EMPLOYEE', 'Employee'))
 
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username', 'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
@@ -48,3 +53,6 @@ class UserForm(forms.Form):
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control pull-right', 'id': 'datepicker'}))
     sex = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=SEX)
     mobile_number = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}))
+    company = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=COMPANY)
+    position = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'}))
+    type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=TYPE)

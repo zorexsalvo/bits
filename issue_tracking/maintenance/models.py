@@ -39,6 +39,8 @@ class Issue(models.Model):
 class User(models.Model):
     SEX = (('MALE', 'Male'),
            ('FEMALE', 'Female'))
+    TYPE = (('ADMIN', 'Administrator'),
+            ('EMPLOYEE', 'Employee'))
 
     username = models.OneToOneField(AuthUser, related_name='auth_user')
     first_name = models.CharField(max_length=200, validators=[NAME_REGEX])
@@ -49,6 +51,7 @@ class User(models.Model):
     mobile_number = models.CharField(max_length=13, validators=[PHONE_REGEX])
     company = models.ForeignKey('Company', related_name='users')
     position = models.CharField(max_length=200)
+    type = models.CharField(max_length=200, choices=TYPE)
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
 
