@@ -53,6 +53,6 @@ class UserForm(forms.Form):
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control pull-right', 'id': 'datepicker'}))
     sex = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=SEX)
     mobile_number = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}))
-    company = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=COMPANY)
+    company = forms.ModelChoiceField(queryset=Company.objects.all())
     position = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'}))
     type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=TYPE)
