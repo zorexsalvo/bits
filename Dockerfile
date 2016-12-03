@@ -3,6 +3,8 @@ MAINTAINER Zorex Salvo (zsalvo@ayannah.com)
 
 COPY requirements.txt /opt/
 RUN pip install -r /opt/requirements.txt
+RUN python /opt/issue_tracking/manage.py collectstatic --no-input
+RUN python /opt/issue_tracking/manage.py migrate
 
 COPY . /opt/
 
