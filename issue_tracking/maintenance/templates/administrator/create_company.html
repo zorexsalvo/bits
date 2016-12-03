@@ -6,48 +6,7 @@
     <div class="wrapper">
 
         <header class="main-header">
-            <a href="index.html" class="logo">
-              <span class="logo-mini"><b>B</b>IT</span>
-              <span class="logo-lg"><b>BIT</b></span>
-            </a>
-
-            <nav class="navbar navbar-static-top">
-                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                </a>
-
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="../dist/img/id-placeholder.jpg" class="user-image" alt="User Image">
-                                <span class="hidden-xs">{ user.name }</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="user-header">
-                                    <img src="" class="img-circle" alt="User Image">
-                                    <p>
-                                        { user.name - user.type }
-                                    </p>
-                                </li>
-
-                                <li class="user-footer">
-                                    <div class="pull-left">
-                                        <a href="#" class="btn btn-default btn-flat">Profile</a>
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="login.html" class="btn btn-default btn-flat">Sign out</a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li>
-                            
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            {% include 'administrator/header.html' %}
         </header>
 
         <aside class="main-sidebar">
