@@ -47,6 +47,8 @@ class User(models.Model):
     date_of_birth = models.DateField()
     sex = models.CharField(max_length=200, choices=SEX, default='MALE')
     mobile_number = models.CharField(max_length=13, validators=[PHONE_REGEX])
+    company = models.ForeignKey('Company', related_name='users')
+    position = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
 

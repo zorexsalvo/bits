@@ -38,9 +38,13 @@ class CreateCompanyForm(forms.Form):
 
 
 class UserForm(forms.Form):
-    first_name = forms.CharField()
-    middle_name = forms.CharField()
-    last_name = forms.CharField()
-    date_of_birth = forms.DateField(initial=date.today)
-    sex = forms.ChoiceField()
-    mobile_number = forms.CharField()
+    SEX = (('MALE', 'Male',), ('FEMALE', 'Female',))
+
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username', 'class': 'form-control'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First Name', 'class': 'form-control'}))
+    middle_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Middle Name', 'class': 'form-control'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'form-control'}))
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control pull-right', 'id': 'datepicker'}))
+    sex = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=SEX)
+    mobile_number = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}))

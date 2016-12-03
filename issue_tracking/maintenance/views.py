@@ -81,3 +81,14 @@ class ViewEmployee(AdministratorView):
         context['employees'] = self.get_employees()
         context['user'] = self.get_user(request)
         return render(request, self.template_name, context)
+
+
+class CreateEmployee(AdministratorView):
+    template_name = 'administrator/create_employee.html'
+    form_class = UserForm
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        context['form'] = self.form_class()
+        context['user'] = self.get_user(request)
+        return render(request, self.template_name, context)
