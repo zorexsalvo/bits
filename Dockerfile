@@ -13,6 +13,6 @@ EXPOSE 8080
 
 WORKDIR /opt/
 
-CMD ["./issue_tracking/manage.py", "runserver", "0.0.0.0:8080"]
+CMD ["python", "issue_tracking/manage.py", "runserver", "0.0.0.0:8080"]
 
 
