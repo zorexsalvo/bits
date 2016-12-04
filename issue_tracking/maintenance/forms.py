@@ -1,7 +1,7 @@
 from datetime import date
 from django import forms
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as AuthUser
 from .models import *
 
 
@@ -24,7 +24,7 @@ class LoginForm(forms.Form):
         return user
 
     class Meta:
-        model = User
+        model = AuthUser
         fields = ['username', 'password']
 
 
@@ -56,3 +56,12 @@ class UserForm(forms.Form):
     company = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), queryset=Company.objects.all())
     position = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'}))
     type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=TYPE)
+
+    def clean(self):
+        if AuthUser.objects.filter(username=self.cleaned_data['username']):
+            raise forms.ValidationError('Username already taken.')
+        if User.objects.filter(first_name=self.cleaned_data['first_name']) \
+                       .filter(middle_name=self.cleaned_data['middle_name']) \
+                       .filter(last_name=self.cleaned_data['last_name']):
+            raise forms.ValidationError('User already exists.')
+        return self.cleaned_data
