@@ -20,6 +20,8 @@ class LoginView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/create_company')
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
