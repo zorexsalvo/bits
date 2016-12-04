@@ -42,7 +42,7 @@
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="#"><a href="index.html"><i class="fa fa-plus-square"></i> Create Tracker</a></li>
+                        <li class="#"><a href="/create_tracker/{{ company.id }}"><i class="fa fa-plus-square"></i> Create Tracker</a></li>
                         <li class="treeview">
                             <a href="#">
                                 <i class="fa fa-wifi"></i> <span>Open Trackers</span>
@@ -51,8 +51,11 @@
                                 </span>
                             </a>
                             <ul class="treeview-menu">
-                                <li class="#"><a href="index.html"><i class="fa fa-plus-square"></i> Create Tracker</a></li>
-                                <li><a href="#"><i class="fa fa-wifi"></i> Open Trackers</a></li>
+                                {% for tracker in company.trackers.all %}
+                                <li><a href="#">{{ tracker }}</a></li>
+                                {% empty %}
+                                <li><a href="#">No trackers found.</a></li>
+                                {% endfor %}
                             </ul>
                         </li>
                     </ul>

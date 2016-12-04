@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from maintenance.models import User, Issue, Ticket, Company
+from maintenance.models import User, Issue, Ticket, Company, Tracker
 
 
 class TicketInline(admin.StackedInline):
@@ -73,4 +73,5 @@ admin.site.register(Company)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(Tracker)
 admin.site.site_header = 'Issue Tracking System'

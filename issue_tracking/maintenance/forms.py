@@ -65,3 +65,7 @@ class UserForm(forms.Form):
                        .filter(last_name=self.cleaned_data['last_name']):
             raise forms.ValidationError('User already exists.')
         return self.cleaned_data
+
+
+class TrackerForm(forms.Form):
+    tracker = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Tracker', 'class': 'form-control'}))

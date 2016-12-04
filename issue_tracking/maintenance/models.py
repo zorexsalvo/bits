@@ -94,3 +94,11 @@ class Repository(models.Model):
 
     def __unicode__(self):
         return self.issue
+
+
+class Tracker(models.Model):
+    name = models.CharField(max_length=200)
+    company = models.ForeignKey(Company, related_name='trackers')
+
+    def __unicode__(self):
+        return self.name

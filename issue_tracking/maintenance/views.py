@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views import View
 from .forms import *
-from .models import Company, User
+from .models import Company, User, Tracker
 
 
 def logout_view(request):
@@ -118,9 +118,35 @@ class CreateEmployee(AdministratorView):
             user.mobile_number = form.cleaned_data.get('mobile_number')
             user.company = form.cleaned_data.get('company')
             user.position = form.cleaned_data.get('position')
+            user.created_by = request.user
             user.save()
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
 
         context['form'] = form
         return render(request, self.template_name, context)
+
+
+class CreateTracker(AdministratorView):
+    template_name = 'administrator/create_tracker.html'
+    form_class = TrackerForm
+
+    def get(self, request, company_id, *args, **kwargs):
+        context = self.get_context(request)
+        context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+    def post(self, request, company_id, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+        context['request'] = 'POST'
+
+        if form.is_valid():
+            tracker = Tracker.objects.create(name=form.cleaned_data.get('tracker'),
+                                             company=Company.objects.get(id=company_id))
+            context['form'] = self.form_class()
+            return render(request, self.template_name, context)
+        
+        context['form'] = form
+        return render(request, self.template_name, context)
+
