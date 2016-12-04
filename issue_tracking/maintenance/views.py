@@ -116,7 +116,7 @@ class CreateEmployee(AdministratorView):
             user.sex = form.cleaned_data.get('sex')
             user.date_of_birth = form.cleaned_data.get('date_of_birth')
             user.mobile_number = form.cleaned_data.get('mobile_number')
-            user.company = Company.objects.filter(pk=form.cleaned_data.get('company')).first()
+            user.company = form.cleaned_data.get('company')
             user.position = form.cleaned_data.get('position')
             user.save()
             context['form'] = self.form_class()
