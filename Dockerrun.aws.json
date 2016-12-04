@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "zorex/issue-tracking-system",
+    "Name": "zorex/issue-tracking-system:latest",
     "Update": "true"
   },
   "Ports": [
@@ -11,3 +11,4 @@
   ],
   "Logging": "/var/log/"
 }
+

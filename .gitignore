@@ -11,7 +11,6 @@ venv/
 env/
 build/
 develop-eggs/
-dist/
 eggs/
 lib/
 lib64/
@@ -55,5 +54,4 @@ docs/_build/
 target/
 
 # Static Files
-issue_tracking/maintenance/static/
 issue_tracking/static/
