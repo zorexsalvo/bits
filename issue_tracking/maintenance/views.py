@@ -102,7 +102,7 @@ class CreateEmployee(AdministratorView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context(request)
-        form = self.form_class(request.POST or None)
+        form = self.form_class(request.POST, request.FILES)
         context['request'] = 'POST'
 
         if form.is_valid():
@@ -119,10 +119,10 @@ class CreateEmployee(AdministratorView):
             user.company = form.cleaned_data.get('company')
             user.position = form.cleaned_data.get('position')
             user.created_by = request.user
+            user.picture = form.cleaned_data.get('picture')
             user.save()
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
-
         context['form'] = form
         return render(request, self.template_name, context)
 
