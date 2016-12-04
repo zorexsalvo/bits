@@ -53,6 +53,7 @@ class User(models.Model):
     position = models.CharField(max_length=200)
     type = models.CharField(max_length=200, choices=TYPE)
     date_created = models.DateTimeField(auto_now_add=True)
+    picture = models.ImageField(upload_to='images')
     created_by = models.CharField(max_length=200)
 
     def __unicode__(self):
