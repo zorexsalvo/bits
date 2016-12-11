@@ -146,7 +146,48 @@ class CreateTracker(AdministratorView):
                                              company=Company.objects.get(id=company_id))
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
-        
+
         context['form'] = form
         return render(request, self.template_name, context)
 
+
+class UserView(TemplateView):
+    def get_user(self, request):
+        return  User.objects.filter(username=request.user).first()
+
+    def get_context(self, request):
+        context = {}
+        context['user'] = self.get_user(request)
+        return context
+
+
+class DashboardView(UserView):
+    template_name = 'user/index.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        return render(request, self.template_name, context)
+
+
+class IssueView(UserView):
+    template_name = 'user/issue.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        return render(request, self.template_name, context)
+
+
+class UserDirectoryView(UserView):
+    template_name = 'user/user.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        return render(request, self.template_name, context)
+
+
+class CheckView(UserView):
+    template_name = 'user/check.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        return render(request, self.template_name, context)

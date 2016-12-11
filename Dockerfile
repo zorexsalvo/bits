@@ -11,7 +11,7 @@ RUN python /opt/issue_tracking/manage.py migrate
 
 EXPOSE 8080
 
-WORKDIR /opt/
+WORKDIR /opt/issue_tracking/
 
 CMD ["python", "issue_tracking/manage.py", "runserver", "0.0.0.0:8080"]
 
