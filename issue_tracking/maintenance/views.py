@@ -187,6 +187,13 @@ class UpdateEmployee(AdministratorView):
         return render(request, self.template_name, context)
 
 
+class DeleteEmployee(AdministratorView):
+    def get(self, request, employee_id, *args, **kwargs):
+        user = User.objects.filter(id=employee_id)
+        user.delete()
+        return HttpResponseRedirect('/view_employee')
+
+
 class UserView(TemplateView):
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
