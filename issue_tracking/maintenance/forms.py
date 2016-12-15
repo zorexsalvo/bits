@@ -68,5 +68,23 @@ class UserForm(forms.Form):
         return self.cleaned_data
 
 
+class UpdateUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+        exclude = ['username', 'created_by', 'type']
+        widgets = {
+            'username': forms.HiddenInput(),
+            'first_name': forms.TextInput(attrs={'placeholder': 'First Name', 'class': 'form-control'}),
+            'middle_name': forms.TextInput(attrs={'placeholder': 'Middle Name', 'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'form-control'}),
+            'sex': forms.Select(attrs={'class': 'form-control'}),
+            'mobile_number': forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}),
+            'date_of_birth': forms.DateInput(attrs={'class': 'form-control pull right', 'id': 'datepicker'}),
+            'picture': forms.ClearableFileInput(attrs={'class': 'btn btn-md form-control'}),
+            'company': forms.Select(attrs={'class': 'form-control'}),
+            'position': forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'})
+        }
+
 class TrackerForm(forms.Form):
     tracker = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Tracker', 'class': 'form-control'}))
