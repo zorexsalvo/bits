@@ -55,3 +55,4 @@ target/
 
 # Static Files
 issue_tracking/static/
+/static/

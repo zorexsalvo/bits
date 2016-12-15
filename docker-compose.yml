@@ -1,0 +1,6 @@
+web:
+    build: .
+    command: uwsgi --ini uwsgi.ini
+    ports:
+      - "8080:8080"
+
