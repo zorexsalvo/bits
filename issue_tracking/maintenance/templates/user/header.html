@@ -11,12 +11,20 @@
         <ul class="nav navbar-nav">
             <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    {% if user.picture.url %}
                     <img src="{{ user.picture.url }}" class="user-image" alt="User Image">
+                    {% else %}
+                    <img src="/media/images/person.png" class="user-image" alt="User Image">
+                    {% endif %}
                     <span class="hidden-xs">{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
                 </a>
                 <ul class="dropdown-menu">
                     <li class="user-header">
+                        {% if user.picture.url %}
                         <img src="{{ user.picture.url }}" class="img-circle" alt="User Image">
+                        {% else %}
+                        <img src="/media/images/person.png" class="img-circle" alt="User Image">
+                        {% endif %}
                         <p>
                             {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }} - {{ user.position }}
                         </p>

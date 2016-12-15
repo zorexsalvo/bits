@@ -59,10 +59,10 @@
                                 <td>{{ employee.company }}</td>
                                 <td>{{ employee.position }}</td>
                                 <td>
-                                     <a class="btn btn-social btn-bitbucket">
+                                     <a class="btn btn-social btn-bitbucket" href="/update_employee/{{ employee.id }}/">
                                         <i class="fa fa-edit"></i> Update
                                     </a>
-                                    <a class="btn btn-social bg-maroon">
+                                    <a class="btn btn-social bg-maroon" href="/delete_employee/{{ employee.id }}/">
                                         <i class="fa fa-trash-o"></i> Delete
                                     </a>
                                 </td>
