@@ -151,6 +151,42 @@ class CreateTracker(AdministratorView):
         return render(request, self.template_name, context)
 
 
+class UpdateEmployee(AdministratorView):
+    template_name = 'administrator/update_employee.html'
+    form_class = UpdateUserForm
+
+    def get(self, request, employee_id, *args, **kwargs):
+        context = self.get_context(request)
+        user = User.objects.get(pk=employee_id)
+        form = self.form_class(instance=user)
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+    def post(self, request, employee_id, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        context = self.get_context(request)
+        context['request'] = 'POST'
+
+        if form.is_valid():
+            user = User.objects.filter(id=employee_id)
+            user.update(
+                first_name = form.cleaned_data.get('first_name'),
+                middle_name = form.cleaned_data.get('middle_name'),
+                last_name = form.cleaned_data.get('last_name'),
+                sex = form.cleaned_data.get('sex'),
+                date_of_birth = form.cleaned_data.get('date_of_birth'),
+                mobile_number = form.cleaned_data.get('mobile_number'),
+                company = form.cleaned_data.get('company'),
+                position = form.cleaned_data.get('position'),
+                picture = form.cleaned_data.get('picture')
+            )
+            context['form'] = form
+            return render(request, self.template_name, context)
+
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+
 class UserView(TemplateView):
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
