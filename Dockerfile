@@ -13,6 +13,6 @@ EXPOSE 8080
 
 WORKDIR /opt/issue_tracking/
 
-CMD ["python", "issue_tracking/manage.py", "runserver", "0.0.0.0:8080"]
+CMD ["uwsgi", "--ini", "uwsgi.ini"]
 
 
