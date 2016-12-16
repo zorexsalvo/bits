@@ -40,8 +40,6 @@ class CreateCompanyForm(forms.Form):
 
 class UserForm(forms.Form):
     SEX = (('MALE', 'Male',), ('FEMALE', 'Female',))
-    COMPANY = ()
-    COMPANY += tuple((company.id, company.name) for company in Company.objects.all())
     TYPE = (('ADMIN', 'Admin'),
             ('EMPLOYEE', 'Employee'))
 
