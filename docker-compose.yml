@@ -1,4 +1,6 @@
 web:
+    volumes:
+        - .:/opt/
     build: .
     command: uwsgi --ini uwsgi.ini
     ports:
