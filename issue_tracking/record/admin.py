@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from maintenance.models import User, Issue, Ticket, Company, Tracker
+from .models import User, Issue, Ticket, Company, Tracker
 
 
 class TicketInline(admin.StackedInline):
