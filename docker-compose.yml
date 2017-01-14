@@ -1,7 +1,7 @@
 web:
     build: .
     volumes:
-        - /issue_tracking/:/opt/issue_tracking/
+        - ./issue_tracking/:/opt/
     command: uwsgi --ini uwsgi.ini
     ports:
       - "8080:8080"
