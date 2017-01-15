@@ -38,3 +38,13 @@ class CompanyTestCase(TestCase):
                                         password='password123',
                                         email='juan@bits.com')
 
+    def test_save_company_unauthenticated(self):
+        url = reverse('create_company')
+        form = CompanyForm({'name': 'Ayannah'})
+
+        self.assertTrue(form.is_valid())
+        response = self.client.post(url, form=form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/create_company/')
+
