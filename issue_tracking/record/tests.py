@@ -48,3 +48,14 @@ class CompanyTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/login/?next=/create_company/')
 
+    def test_save_company_authenticated(self):
+        self.client.login(username='juan', password='password123')
+
+        url = reverse('create_company')
+        form = CompanyForm({'name': 'Ayannah'})
+
+        self.assertTrue(form.is_valid())
+        response = self.client.post(url, data=form.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Company.objects.count(), 1)
