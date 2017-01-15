@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views import View
+
 from .forms import *
 from .models import Company, User, Tracker
 
@@ -48,8 +49,7 @@ class AdministratorView(TemplateView):
 
 
 class CreateCompany(AdministratorView):
-
-    form_class = CreateCompanyForm
+    form_class = CompanyForm
     template_name = 'administrator/create_company.html'
 
     def get(self, request, *args, **kwargs):

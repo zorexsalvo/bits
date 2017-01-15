@@ -28,7 +28,7 @@ class LoginForm(forms.Form):
         fields = ['username', 'password']
 
 
-class CreateCompanyForm(forms.Form):
+class CompanyForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter company name', 'class': 'form-control'}))
 
     def clean(self):
