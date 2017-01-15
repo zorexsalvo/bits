@@ -1,4 +1,5 @@
-from django.test import TestCase
+from django.test import TestCase, Client
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
@@ -27,4 +28,13 @@ class LoginTestCase(TestCase):
 
         self.assertTrue(form.is_valid())
         self.assertIsNotNone(authenticate(username='juan', password='password123'))
+
+
+class CompanyTestCase(TestCase):
+    def setUp(self):
+        client = Client()
+
+        user = User.objects.create_user(username='juan',
+                                        password='password123',
+                                        email='juan@bits.com')
 
