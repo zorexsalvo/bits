@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 from django.core.urlresolvers import reverse
 
-from .models import Company
+from .models import Company, Tracker
 from .forms import LoginForm, CompanyForm
 
 class ModelTestCase(TestCase):
@@ -59,3 +59,18 @@ class CompanyTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Company.objects.count(), 1)
+
+
+class TrackerTestCase(TestCase):
+    def setUp(self):
+        company = Company(name='My Company')
+        company.save()
+
+    def test_save_tracker(self):
+        company = Company.objects.filter(name='My Company').first()
+        tracker = Tracker(name='Tracker1',
+                          company=company)
+        tracker.save()
+
+        self.assertIsNotNone(company)
+        self.assertEqual(Tracker.objects.count(), 1)
