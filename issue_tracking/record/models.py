@@ -3,13 +3,8 @@ from django.contrib.auth.models import User as AuthUser
 from django.core.validators import RegexValidator
 from django.db import models
 
-
-PHONE_REGEX = RegexValidator(
-    regex=r'^\b(09)\d{9}?\b$',
-    message='Phone number must be entered in the format: 09XXXXXXXXXX.')
-NAME_REGEX = RegexValidator(
-    regex=r'^[a-zA-Z\xd1\xf1\s.-]*$',
-message='Invalid input.')
+PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
+NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
 
 
 class Company(models.Model):
