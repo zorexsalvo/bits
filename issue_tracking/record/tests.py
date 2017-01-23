@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 
 from django.core.urlresolvers import reverse
 
-from .models import Company, Tracker
-from .forms import LoginForm, CompanyForm
+from .models import Company, Tracker, Issue
+from .forms import LoginForm, CompanyForm, IssueForm
 
 class ModelTestCase(TestCase):
     def setUp(self):
@@ -74,3 +74,16 @@ class TrackerTestCase(TestCase):
 
         self.assertIsNotNone(company)
         self.assertEqual(Tracker.objects.count(), 1)
+
+
+class IssueTestCase(TestCase):
+    def setUp(self):
+        pass
+
+    def test_save_issue(self):
+        issue_form = IssueForm({'title': 'Test this bug!',
+                                'created_by': 'unittest'})
+        self.assertTrue(issue_form.is_valid)
+
+        issue_form.save()
+        self.assertEqual(1, Issue.objects.count())
