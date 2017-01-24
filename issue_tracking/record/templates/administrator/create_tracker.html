@@ -1,7 +1,7 @@
 {% extends 'administrator/base.html' %}
 {% load staticfiles %}
-
 {% block content %}
+
 <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
 
@@ -28,65 +28,64 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="box">
+
                             <form role="form" method="POST">
                                 {% csrf_token %}
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label>Tracker</label>
-                                        {{ form.tracker }}
+                                        <label>Tracker</label> {{ form.tracker }}
                                     </div>
                                 </div>
-                            <!-- /.box-body -->
-
                                 <div class="box-footer">
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
-                                    <!-- MODAL -->
-                                    <div class="modal fade" id="cfModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title" id="myModalLabel">Create Tracker</h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    {% if form.non_field_errors %}
-                                                        {% for error in form.non_field_errors %}
-                                                            {{ error }}
-                                                        {% endfor %}
-                                                    {% else %}
-                                                        Tracker has been created successfully.
-                                                    {% endif %}
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- MODAL -->
                             </form>
+
                         </div>
                     </div>
                 </div>
             </section>
         </div>
 
-
-
     </div>
-{% block footer %}
-{{ block.super }}
-{% endblock footer %}
 
-{% block js %}
-{{ block.super }}
-{% if request == 'POST' %}
-<script type="text/javascript">
-    $(window).load(function(){
-        $('#cfModal').modal('show');
-    });
-</script>
-{% endif %}
-{% endblock js %}
+    <!--confirmationModal-->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Create Tracker</h4>
+                </div>
+                <div class="modal-body">
+                    {% if form.non_field_errors %}
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    {% else %}
+                        Tracker has been created successfully.
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--confirmationModal-->
+
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
+
+    {% block js %}
+        {{ block.super }}
+        {% if request == 'POST' %}
+            <script type="text/javascript">
+            $(window).load(function(){
+                $('#confirmationModal').modal('show');
+            });
+            </script>
+        {% endif %}
+    {% endblock js %}
 </body>
 {% endblock content %}
