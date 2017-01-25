@@ -86,3 +86,9 @@ class UpdateUserForm(forms.ModelForm):
 
 class TrackerForm(forms.Form):
     tracker = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Tracker', 'class': 'form-control'}))
+
+
+class IssueForm(forms.ModelForm):
+    class Meta:
+        model = Issue
+        exclude = ('reference_id',)

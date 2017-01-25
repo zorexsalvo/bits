@@ -56,3 +56,6 @@ target/
 # Static Files
 issue_tracking/static/
 /static/
+
+# Database
+db.sqlite3

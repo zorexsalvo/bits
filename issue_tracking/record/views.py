@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views import View
+from django.urls import reverse
 
 from .forms import *
 from .models import Company, User, Tracker
@@ -22,15 +23,17 @@ class LoginView(TemplateView):
     def get(self, request, *args, **kwargs):
         form = self.form_class()
         if request.user.is_authenticated():
-            return HttpResponseRedirect('/create_company')
+            url = reverse('create_company')
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        url = reverse('create_company')
         if form.is_valid():
             user = form.login(request)
             _login = login(request, user)
-            return HttpResponseRedirect('/create_company/')
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
 
 
@@ -215,8 +218,14 @@ class DashboardView(UserView):
 class IssueView(UserView):
     template_name = 'user/issue.html'
 
+    def get_issue(self, user):
+        if user:
+            return Issue.objects.filter(created_by__company__id=user.company.id)
+        return Issue.objects.all()
+
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['issues'] = self.get_issue(context['user'])
         return render(request, self.template_name, context)
 
 

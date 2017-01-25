@@ -1,0 +1,9 @@
+web:
+    build: .
+    volumes:
+        - ./issue_tracking/:/opt/
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+        - APP_DEBUG=true
+    ports:
+        - "8000:8000"
