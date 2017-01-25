@@ -24,7 +24,7 @@ class LoginView(TemplateView):
         form = self.form_class()
         if request.user.is_authenticated():
             url = reverse('create_company')
-            return HttpResponseRedirect('url')
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
