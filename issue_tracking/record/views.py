@@ -218,8 +218,14 @@ class DashboardView(UserView):
 class IssueView(UserView):
     template_name = 'user/issue.html'
 
+    def get_issue(self, user):
+        if user:
+            return Issue.objects.filter(created_by__company__id=user.company.id)
+        return Issue.objects.all()
+
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['issues'] = self.get_issue(context['user'])
         return render(request, self.template_name, context)
 
 
