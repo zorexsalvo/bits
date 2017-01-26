@@ -105,7 +105,7 @@ class CreateEmployee(AdministratorView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context(request)
-        form = self.form_class(request.POST, request.FILES)
+        form = self.form_class(request.POST or None, request.FILES or None)
         context['request'] = 'POST'
 
         if form.is_valid():
