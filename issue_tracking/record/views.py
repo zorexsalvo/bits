@@ -61,13 +61,15 @@ class LoginView(TemplateView):
         return render(request, self.template_name, {'form': form, 'user': user})
 
     def post(self, request, *args, **kwargs):
+        user = User.objects.filter(username__username=request.GET.get('username')).first()
+
         form = self.form_class(request.POST)
         url = reverse('create_company')
         if form.is_valid():
             user = form.login(request)
             _login = login(request, user)
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'user':user})
 
 
 class AdministratorView(TemplateView):
