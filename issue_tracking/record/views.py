@@ -192,9 +192,10 @@ class UpdateEmployee(AdministratorView):
 
 class DeleteEmployee(AdministratorView):
     def get(self, request, employee_id, *args, **kwargs):
+        url = reverse('view_employee')
         user = User.objects.filter(id=employee_id)
         user.delete()
-        return HttpResponseRedirect('/view_employee')
+        return HttpResponseRedirect(url)
 
 
 class UserView(TemplateView):
