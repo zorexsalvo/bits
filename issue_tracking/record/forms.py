@@ -5,9 +5,17 @@ from django.contrib.auth.models import User as AuthUser
 from .models import *
 
 
+class UsernameForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
+
+    def clean(self):
+        if not User.objects.filter(username__username=self.cleaned_data.get('username')):
+            raise forms.ValidationError('No such user.')
+        return self.cleaned_data
+
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username','class': 'form-control'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password', 'class': 'form-control'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username','class': 'form-control'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'password', 'class': 'form-control'}))
 
     def clean(self):
         username = self.cleaned_data.get('username')
