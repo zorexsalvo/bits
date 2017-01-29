@@ -109,7 +109,7 @@ class CreateCompany(AdministratorView):
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
 
-        context['form'] = form
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -161,7 +161,7 @@ class CreateEmployee(AdministratorView):
             user.save()
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
-        context['form'] = form
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -185,7 +185,7 @@ class CreateTracker(AdministratorView):
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
 
-        context['form'] = form
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -253,6 +253,7 @@ class DashboardView(UserView):
 
 class IssueView(UserView):
     template_name = 'user/issue.html'
+    form_class = IssueForm
 
     def get_issue(self, user):
         if user:
@@ -260,8 +261,23 @@ class IssueView(UserView):
         return Issue.objects.all()
 
     def get(self, request, *args, **kwargs):
+        form = self.form_class()
         context = self.get_context(request)
         context['issues'] = self.get_issue(context['user'])
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST or None)
+        context = self.get_context(request)
+        context['issues'] = self.get_issue(context['user'])
+        context['form'] = form
+
+        if form.is_valid():
+            data = form.cleaned_data
+            data['created_by'] = User.objects.get(username=request.user)
+            Issue.objects.create(**data)
+            context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 

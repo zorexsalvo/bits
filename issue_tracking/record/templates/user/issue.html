@@ -29,7 +29,7 @@
 
                                 <div class="box-header">
                                     <h3 class="box-title">
-                                        <button class="btn btn-default">Create New Issue</button>
+                                        <button class="btn btn-default" data-toggle="modal" data-target="#issueModal">Create New Issue</button>
                                     </h3>
                                     <div class="box-tools">
                                         <div class="input-group input-group-sm" style="width: 150px;">
@@ -68,6 +68,32 @@
 
         </div>
 
+<!-- IssueModal -->
+<div class="modal fade" id="issueModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Create New Issue</h4>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
     </div>
 
     {% block footer %}
@@ -76,6 +102,11 @@
 
     {% block js %}
         {{ block.super }}
+        <script type="text/javascript">
+            $(function () {
+                $(".select2").select2();
+            });
+        </script>
     {% endblock js %}
 </body>
 {% endblock content %}
