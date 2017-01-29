@@ -27,6 +27,23 @@
             <section class="content">
                 <div class="row">
                     <div class="col-xs-12">
+
+                        {% if request == 'POST' %}
+                            {% if form.non_field_errors %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-warning alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                        <i class="icon fa fa-warning"></i> {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <i class="icon fa fa-check"></i> Tracker has been created successfully!
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
                         <div class="box">
 
                             <form role="form" method="POST">
@@ -49,43 +66,12 @@
 
     </div>
 
-    <!--confirmationModal-->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Create Tracker</h4>
-                </div>
-                <div class="modal-body">
-                    {% if form.non_field_errors %}
-                        {% for error in form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-                    {% else %}
-                        Tracker has been created successfully.
-                    {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--confirmationModal-->
-
     {% block footer %}
         {{ block.super }}
     {% endblock footer %}
 
     {% block js %}
         {{ block.super }}
-        {% if request == 'POST' %}
-            <script type="text/javascript">
-            $(window).load(function(){
-                $('#confirmationModal').modal('show');
-            });
-            </script>
-        {% endif %}
     {% endblock js %}
 </body>
 {% endblock content %}

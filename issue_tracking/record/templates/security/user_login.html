@@ -8,25 +8,19 @@
             <img src="/media/images/bits.logo.png" alt="Logo Image" style="width:150">
         </div>
 
-        {% if user.first_name %}
-            <div class="lockscreen-name">{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</div>
-        {% endif %}
+        <div class="lockscreen-name"></div>
 
         <div class="lockscreen-item">
             <div class="lockscreen-image">
-                {% if user.picture %}
-                    <img src="{{ user.picture.url }}" alt="User Image">
-                {% else %}
-                    <img src="/media/images/person.png" alt="User Image">
-                {% endif %}
+                <img src="/media/images/person.png" alt="User Image">
             </div>
 
             {% if form %}
             <form class="lockscreen-credentials" method="POST">
             {% csrf_token %}
                 <div class="input-group">
-                    {{ form.username.as_hidden }}
-                    {{ form.password }}
+                    {{ form.username }}
+
                     <div class="input-group-btn">
                         <button type="submit" class="btn"><i class="fa fa-arrow-right text-muted"></i></button>
                     </div>
@@ -35,10 +29,6 @@
             {% endif %}
 
         </div>
-
-    <div class="text-center">
-        <a href="/login/user/">Or sign in as a different user</a>
-    </div>
 
     <div class="lockscreen-footer text-center">
        <strong>Copyright &copy; 2015-2016 <a href="#">BITS Device</a>.</strong><br/>All rights reserved.

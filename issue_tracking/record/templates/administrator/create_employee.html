@@ -32,6 +32,24 @@
             <section class="content">
                 <div class="row">
                     <div class="col-xs-12">
+
+                        {% if request == 'POST' %}
+                            {% if form.non_field_errors %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-warning alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                        <i class="icon fa fa-warning"></i> {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <h4><i class="icon fa fa-check"></i> Success!</h4>
+                                    Text INFO to 21584652 (Cross-telco: 29290584652) to subscribe to SMS Notification.
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
                         <div class="box">
                             <form role="form" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
@@ -126,30 +144,7 @@
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </div>
-                                <!-- MODAL -->
-                                <div class="modal fade" id="cfModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="myModalLabel">Create Employee</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                {% if form.non_field_errors %}
-                                                    {% for error in form.non_field_errors %}
-                                                        {{ error }}
-                                                    {% endfor %}
-                                                {% else %}
-                                                    Employee has been created successfully. <br><br>
-                                                    Text INFO to 21584652 (Cross-telco: 29290584652) to subscribe to SMS Notification.
-                                                {% endif %}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- MODAL -->
+
                         </form>
                     </div>
 
@@ -167,13 +162,6 @@
 {% block js %}
 {{ block.super }}
 <script src="{% static 'plugins/datepicker/bootstrap-datepicker.js' %}"></script>
-{% if request == 'POST' %}
-<script type="text/javascript">
-    $(window).load(function(){
-        $('#cfModal').modal('show');
-    });
-</script>
-{% endif %}
 <script>
     //Date picker
     $('#datepicker').datepicker({

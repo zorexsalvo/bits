@@ -13,12 +13,21 @@ from .models import Company, User, Tracker
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect('/login/')
+    return HttpResponseRedirect('/login/user/')
 
 
-class LoginView(TemplateView):
-    form_class = LoginForm
-    template_name = 'security/login.html'
+class UsernameLoginView(TemplateView):
+    form_class = UsernameForm
+    template_name = 'security/user_login.html'
+
+    def build_url(self, *args, **kwargs):
+        url = reverse('login')
+        query_params = kwargs.pop('q', None)
+
+        if query_params:
+            url += '?username={}'.format(query_params.get('username'))
+
+        return url
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
@@ -29,12 +38,38 @@ class LoginView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+
+        if form.is_valid():
+            url = self.build_url(reverse('login'), q={'username': form.cleaned_data['username']})
+            return HttpResponseRedirect(url)
+        return render(request, self.template_name, {'form': form})
+
+
+class LoginView(TemplateView):
+    form_class = LoginForm
+    template_name = 'security/login.html'
+
+    def get(self, request, *args, **kwargs):
+        user = User.objects.filter(username__username=request.GET.get('username')).first()
+        img_url = None
+
+        form = self.form_class({'username': request.GET.get('username')})
+
+        if request.user.is_authenticated():
+            url = reverse('create_company')
+            return HttpResponseRedirect(url)
+        return render(request, self.template_name, {'form': form, 'user': user})
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.filter(username__username=request.GET.get('username')).first()
+
+        form = self.form_class(request.POST)
         url = reverse('create_company')
         if form.is_valid():
             user = form.login(request)
             _login = login(request, user)
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'user':user})
 
 
 class AdministratorView(TemplateView):
@@ -105,7 +140,7 @@ class CreateEmployee(AdministratorView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context(request)
-        form = self.form_class(request.POST, request.FILES)
+        form = self.form_class(request.POST or None, request.FILES or None)
         context['request'] = 'POST'
 
         if form.is_valid():
@@ -192,9 +227,10 @@ class UpdateEmployee(AdministratorView):
 
 class DeleteEmployee(AdministratorView):
     def get(self, request, employee_id, *args, **kwargs):
+        url = reverse('view_employee')
         user = User.objects.filter(id=employee_id)
         user.delete()
-        return HttpResponseRedirect('/view_employee')
+        return HttpResponseRedirect(url)
 
 
 class UserView(TemplateView):
