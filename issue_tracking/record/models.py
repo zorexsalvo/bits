@@ -68,25 +68,14 @@ class Issue(models.Model):
         Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
 
 
-class Ticket(models.Model):
-    issue = models.ForeignKey(Issue, related_name='tickets')
+class Thread(models.Model):
+    issue = models.ForeignKey(Issue, related_name='threads')
     note = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
 
     def __unicode__(self):
         return '{} - {}'.format(self.reference_id, self.assigned_to)
-
-
-class Repository(models.Model):
-    issue = models.ForeignKey(Issue, related_name='issue_repository')
-    ticket = models.ForeignKey(Ticket, related_name='ticket_repository')
-
-    class Meta:
-        verbose_name_plural = 'Repositories'
-
-    def __unicode__(self):
-        return self.issue
 
 
 class Tracker(models.Model):
