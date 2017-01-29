@@ -216,7 +216,7 @@ class UpdateEmployee(AdministratorView):
                 mobile_number = form.cleaned_data.get('mobile_number'),
                 company = form.cleaned_data.get('company'),
                 position = form.cleaned_data.get('position'),
-                picture = form.cleaned_data.get('picture')
+                picture = '/images/' + str(form.cleaned_data.get('picture'))
             )
             context['form'] = form
             return render(request, self.template_name, context)
