@@ -22,7 +22,7 @@
                     {{ form.username }}
 
                     <div class="input-group-btn">
-                        <button type="submit" class="btn"><i class="fa fa-arrow-right text-muted"></i></button>
+                        <button type="submit" class="btn shake"><i class="fa fa-arrow-right text-muted"></i></button>
                     </div>
                 </div>
             </form>
@@ -36,6 +36,17 @@
     </div>
 
     </div>
+
+    {% block js %}
+        {{ block.super }}
+        {% if form.errors %}
+            <script>
+                $(document).ready(function(){
+                    $(".shake").effect( "shake", {times:3}, 500);
+                });
+            </script>
+        {% endif %}
+    {% endblock js %}
 
 </body>
 {% endblock content %}
