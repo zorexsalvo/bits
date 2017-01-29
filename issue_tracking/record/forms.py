@@ -107,3 +107,12 @@ class IssueForm(forms.ModelForm):
             'remark': forms.Select(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'})
         }
+
+
+class ThreadForm(forms.ModelForm):
+    class Meta:
+        model = Thread
+        fields = ['note',]
+        widgets = {
+            'note': forms.TextInput(attrs={'placeholder': 'Type message...', 'class': 'form-control'}),
+        }

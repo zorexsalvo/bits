@@ -52,7 +52,7 @@
                                         </tr>
                                         {% if issues %} {% for issue in issues %}
                                         <tr>
-                                            <td>{{ issue.reference_id }}</td>
+                                            <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.reference_id }}</a></td>
                                             <td>{{ issue.title }}</td>
                                             <td>{{ issue.created_by }}</td>
                                             <td>{{ issue.priority }}</td>

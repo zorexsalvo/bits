@@ -274,10 +274,11 @@ class IssueView(UserView):
         context['form'] = form
 
         if form.is_valid():
+            url = reverse('issue')
             data = form.cleaned_data
             data['created_by'] = User.objects.get(username=request.user)
             Issue.objects.create(**data)
-            context['form'] = self.form_class()
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
 
@@ -294,4 +295,37 @@ class CheckView(UserView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        return render(request, self.template_name, context)
+
+
+class ThreadView(UserView):
+    template_name = 'user/thread.html'
+    form_class = ThreadForm
+
+    def get_object(self, issue_id):
+        try:
+            return Issue.objects.get(id=issue_id)
+        except Issue.DoesNotExist:
+            None
+
+    def get(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        context['form'] = self.form_class()
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+        return render(request, self.template_name, context)
+
+    def post(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+        context['form'] = form
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            data['issue'] = Issue.objects.get(id=issue_id)
+            data['created_by'] = User.objects.get(username=request.user)
+            Thread.objects.create(**data)
+
         return render(request, self.template_name, context)

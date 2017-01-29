@@ -72,10 +72,10 @@ class Thread(models.Model):
     issue = models.ForeignKey(Issue, related_name='threads')
     note = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(max_length=200)
+    created_by = models.ForeignKey(User, related_name='threads_created')
 
     def __unicode__(self):
-        return '{} - {}'.format(self.reference_id, self.assigned_to)
+        return str(self.issue)
 
 
 class Tracker(models.Model):
