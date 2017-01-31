@@ -48,45 +48,58 @@
                                     </li>
                                 </ul>
                             </div>
-                        </div>
-
-                        <div class="box box-success">
-                            <div class="box-header">
-                                <i class="fa fa-comments-o"></i>
-
-                                <h3 class="box-title">Thread</h3>
-
-                            </div>
-
-                            {% for comment in thread %}
-                            <div class="box-body chat">
-                                <div class="item">
-                                    <img src="{{ comment.created_by.picture.url }}" alt="user image" class="offline">
-
-                                    <p class="message">
-                                        <a href="#" class="name">
-                                            <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> {{ comment.date_created }}</small>
-                                            {{ comment.created_by.first_name }} {{ comment.created_by.middle_name }} {{ comment.created_by.last_name}}
-                                        </a>
-                                        {{ comment.note }}
-                                    </p>
-                                </div>
-                            </div>
-                            {% endfor %}
 
                             <div class="box-footer">
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    <div class="input-group">
-                                        {{ form.note }}
-                                        <div class="input-group-btn">
-                                            <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                                        </div>
+                                <div>
+                                    <div class="box-header">
+                                        <i class="fa fa-comments-o"></i>
+
+                                        <h3 class="box-title">Thread</h3>
+
                                     </div>
-                                </form>
+                                    {% regroup thread by date_created.date as thread_list %}
+                                    {% for comment in thread_list %}
+                                        <div class="box-body chat">
+
+                                            <div class="item text-center">
+                                                <br/> <br/>
+                                                <p class="message">
+                                                    <a href="#" class="name">
+                                                        <small class="text-muted"><i class="fa fa-calendar-o"></i> {{ comment.grouper }}</small>
+                                                    </a>
+                                                </p>
+                                            </div>
+
+                                            {% for comment in comment.list %}
+                                            <div class="item">
+                                                <img src="{{ comment.created_by.picture.url }}" alt="user image" class="offline">
+
+                                                <p class="message">
+                                                    <a href="#" class="name">
+                                                        <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> {{ comment.date_created.time }}</small>
+                                                        {{ comment.created_by.first_name }} {{ comment.created_by.middle_name }} {{ comment.created_by.last_name}}
+                                                    </a>
+                                                    {{ comment.note }}
+                                                </p>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+
+                                    <div class="box-footer">
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <div class="input-group">
+                                                {{ form.note }}
+                                                <div class="input-group-btn">
+                                                    <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </section>
