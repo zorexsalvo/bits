@@ -53,9 +53,21 @@
                                         {% if issues %} {% for issue in issues %}
                                         <tr>
                                             <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.reference_id }}</a></td>
-                                            <td>{{ issue.title }}</td>
+                                            <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.title }}</a></td>
                                             <td>{{ issue.created_by }}</td>
-                                            <td>{{ issue.priority }}</td>
+                                            <td>
+                                                {% if issue.priority == 'LOW' %}
+                                                    <span class="badge">
+                                                {% elif issue.priority == 'NORMAL' %}
+                                                    <span class="badge bg-green">
+                                                {% elif issue.priority == 'HIGH' %}
+                                                    <span class="badge bg-yellow">
+                                                {% else %}
+                                                    <span class="badge bg-red">
+                                                {% endif %}
+                                                    {{ issue.priority }}
+                                                </span>
+                                            </td>
                                             <td>{{ issue.assigned_to }}</td>
                                         </tr>
                                         {% endfor %} {% endif %}
