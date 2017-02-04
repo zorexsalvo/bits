@@ -38,7 +38,7 @@ class User(models.Model):
     created_by = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return '{}, {} {}'.format(self.last_name, self.first_name, self.middle_name)
+        return '{} {}'.format(self.first_name, self.last_name)
 
 
 class Issue(models.Model):
