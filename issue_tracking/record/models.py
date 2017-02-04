@@ -35,6 +35,7 @@ class User(models.Model):
     type = models.CharField(max_length=200, choices=TYPE)
     date_created = models.DateTimeField(auto_now_add=True)
     picture = models.ImageField(upload_to='images')
+    access_token = models.CharField(max_length=200, blank=True, null=True)
     created_by = models.CharField(max_length=200)
 
     def __unicode__(self):
