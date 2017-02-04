@@ -125,4 +125,4 @@ LOGIN_URL = '/login/user/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-DEFAULT_ENVIRONMENT = 'development'
+DEFAULT_ENVIRONMENT = os.getenv('DEFAULT_ENVIRONMENT', 'development')
