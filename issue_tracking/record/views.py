@@ -1,14 +1,18 @@
 import time
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth import login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 
 from .forms import *
 from .models import Company, User, Tracker
+
+import json
 
 
 def logout_view(request):
@@ -329,3 +333,19 @@ class ThreadView(UserView):
             Thread.objects.create(**data)
 
         return render(request, self.template_name, context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SMSView(View):
+    def get(self, request, *args, **kwargs):
+        access_token = self.request.GET.get('access_token')
+        subscriber_number = self.request.GET.get('subscriber_number')
+
+        User.objects.filter(mobile_number__endswith=subscriber_number).update(access_token=access_token)
+        return HttpResponse()
+
+    def post(self, request, *args, **kwargs):
+        unsubscribed = json.loads(self.request.body).get('unsubscribed')
+
+        User.objects.filter(mobile_number__endswith=unsubscribed.get('subscriber_number')).update(access_token=None)
+        return HttpResponse()
