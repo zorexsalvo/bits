@@ -52,10 +52,6 @@
                             <div class="box-footer">
                                 <div>
                                     <div class="box-header">
-                                        <i class="fa fa-comments-o"></i>
-
-                                        <h3 class="box-title">Thread</h3>
-
                                     </div>
                                     {% regroup thread by date_created.date as thread_list %}
                                     {% for comment in thread_list %}
