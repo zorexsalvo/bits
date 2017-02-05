@@ -5,7 +5,7 @@ from os import path
 from . import settings
 
 def get_config_path(filename):
-    return path.join(os.getcwd(), "issue_tracker", "config", filename)
+    return path.abspath("issue_tracker/config/{}".format(filename))
 
 
 def config_for_environment(environment):
