@@ -17,7 +17,8 @@ import json
 import requests
 import logging
 
-GLOBE_LABS_API_CONFIG = 'GlobeLabs'
+SMS_URI = 'https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/{senderAddress}/requests?access_token={access_token}'
+SHORT_CODE = '21584020'
 
 def logout_view(request):
     logout(request)
@@ -270,8 +271,8 @@ class IssueView(UserView):
 
     def send_sms_notification(self, issue):
         issue = Issue.objects.filter(id=issue.id).first()
-        sender_address = sys_config.get(GLOBE_LABS_API_CONFIG, 'short_code')
-        sms_uri = sys_config.get(GLOBE_LABS_API_CONFIG, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+        sender_address = SHORT_CODE
+        sms_uri = SMS_URI.format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
 
         sms_payload = {
             'address': issue.assigned_to.mobile_number,
