@@ -291,6 +291,7 @@ class UserDirectoryView(UserView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['users'] = User.objects.all()
         return render(request, self.template_name, context)
 
 
