@@ -11,9 +11,13 @@ from django.utils.decorators import method_decorator
 
 from .forms import *
 from .models import Company, User, Tracker
+from issue_tracker.config import sys_config
 
 import json
+import requests
+import logging
 
+GLOBE_LABS_API_CONFIG = 'GlobeLabs'
 
 def logout_view(request):
     logout(request)
@@ -264,6 +268,19 @@ class IssueView(UserView):
             return Issue.objects.filter(created_by__company__id=user.company.id)
         return Issue.objects.all()
 
+    def send_sms_notification(self, issue):
+        issue = Issue.objects.filter(id=issue.id).first()
+        sender_address = sys_config.get(GLOBE_LABS_API_CONFIG, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_API_CONFIG, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+
+        sms_payload = {
+            'address': issue.assigned_to.mobile_number,
+            'message': '[New Issue Alert] {}'.format(issue)
+        }
+
+        response = requests.post(sms_uri, data=sms_payload)
+        logging.info(response.text)
+
     def get(self, request, *args, **kwargs):
         form = self.form_class()
         context = self.get_context(request)
@@ -281,7 +298,8 @@ class IssueView(UserView):
             url = reverse('issue')
             data = form.cleaned_data
             data['created_by'] = User.objects.get(username=request.user)
-            Issue.objects.create(**data)
+            issue = Issue.objects.create(**data)
+            self.send_sms_notification(issue)
             return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
