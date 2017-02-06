@@ -17,8 +17,7 @@ import json
 import requests
 import logging
 
-SMS_URI = 'https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/{senderAddress}/requests?access_token={access_token}'
-SHORT_CODE = '21584020'
+GLOBE_LABS_CONFIG_SECTION = 'GlobeLabs'
 
 def logout_view(request):
     logout(request)
@@ -271,16 +270,21 @@ class IssueView(UserView):
 
     def send_sms_notification(self, issue):
         issue = Issue.objects.filter(id=issue.id).first()
-        sender_address = SHORT_CODE
-        sms_uri = SMS_URI.format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+        sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+
+        print(sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token))
 
         sms_payload = {
             'address': issue.assigned_to.mobile_number,
             'message': '[New Issue Alert] {}'.format(issue)
         }
 
-        response = requests.post(sms_uri, data=sms_payload)
-        logging.info(response.text)
+        try:
+            response = requests.post(sms_uri, data=sms_payload)
+            logging.info(response.text)
+        except ProxyError as e:
+            logging.error(e)
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
