@@ -283,7 +283,7 @@ class IssueView(UserView):
         try:
             response = requests.post(sms_uri, data=sms_payload)
             logging.info(response.text)
-        except ProxyError as e:
+        except requests.exceptions.ProxyError as e:
             logging.error(e)
 
     def get(self, request, *args, **kwargs):
