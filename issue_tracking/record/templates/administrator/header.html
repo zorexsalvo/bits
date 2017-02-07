@@ -25,7 +25,12 @@
                             {% for notification in notifications %}
                             <li>
                                 <a href="/notifications/{{ notification.id }}/?q=administrator/" {% if notification.read == False %} style="background: #E7DFDD; text-decoration: none;"{% endif %}>
-                                    <i class="fa fa-warning text-yellow"></i> {{ notification.title }}
+                                    {% if notification.category == 'ISSUE' %}
+                                        <i class="fa fa-warning text-yellow"></i>
+                                    {% else %}
+                                        <i class="fa fa-comment-o text-green"></i>
+                                    {% endif %}
+                                    {{ notification.title }}
                                 </a>
                             </li>
                             {% endfor %}

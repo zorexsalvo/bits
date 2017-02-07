@@ -80,7 +80,7 @@ class Issue(models.Model):
 
     def save(self, *args, **kwargs):
         super(Issue, self).save(*args, **kwargs)
-        issue = Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
+        Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
 
         url = '/issue/{}/thread/'.format(self.id)
         title = '{} assigned you in an issue.'.format(self.created_by)
@@ -100,6 +100,19 @@ class Thread(models.Model):
 
     def __unicode__(self):
         return str(self.issue)
+
+    def save(self, *args, **kwargs):
+        super(Thread, self).save(*args, **kwargs)
+
+        if not self.issue.created_by == self.created_by:
+            url = '/issue/{}/thread/'.format(self.issue.id)
+            title = '{} replied to your issue.'.format(self.created_by)
+
+            Notification.objects.create(user=self.issue.created_by,
+                                        category='THREAD',
+                                        title=title,
+                                        url=url,
+                                        read=False)
 
 
 class Tracker(models.Model):
