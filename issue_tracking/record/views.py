@@ -285,6 +285,8 @@ class IssueView(UserView):
             logging.info(response.text)
         except requests.exceptions.ProxyError as e:
             logging.error(e)
+        except requests.exceptions.ConnectionError as f:
+            logging.error(f)
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
