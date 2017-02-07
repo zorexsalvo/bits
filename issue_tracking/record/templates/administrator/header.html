@@ -9,6 +9,38 @@
     </a>
     <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+
+            <li class="dropdown notifications-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bell-o"></i>
+                    <span class="label label-warning">{{ notifications.count }}</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="header">You have {{ notifications.count }} notifications.</li>
+                    <li>
+                        <ul class="menu">
+                            {% for notification in notifications %}
+                            <li>
+                                <a href="/issue/{{ notification.id }}/thread/">
+                                    {% if issue.priority == 'LOW' %}
+                                        <i class="fa fa-warning">
+                                    {% elif issue.priority == 'NORMAL' %}
+                                        <i class="fa fa-warning text-green">
+                                    {% elif issue.priority == 'HIGH' %}
+                                        <i class="fa fa-warning text-yellow">
+                                    {% else %}
+                                        <i class="fa fa-warning text-red">
+                                    {% endif %}
+                                        </i> {{ notification.title }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                            
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
             <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     {% if user.picture.url %}
@@ -29,7 +61,7 @@
                             {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }} - {{ user.position }}
                         </p>
                     </li>
-            
+
                     <li class="user-footer">
                         <div class="pull-left">
                             <a href="/dashboard/" class="btn btn-default btn-flat">Go to Support Center</a>
@@ -41,9 +73,6 @@
                 </ul>
             </li>
 
-            <li>
-                
-            </li>
         </ul>
     </div>
 </nav>

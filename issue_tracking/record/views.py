@@ -87,10 +87,14 @@ class AdministratorView(TemplateView):
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
 
+    def get_notification(self, request):
+        return Issue.objects.filter(assigned_to__username=request.user)
+
     def get_context(self, request):
         context = {}
         context['companies'] = self.get_companies()
         context['user'] = self.get_user(request)
+        context['notifications'] = self.get_notification(request)
         return context
 
 
@@ -245,9 +249,13 @@ class UserView(TemplateView):
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
 
+    def get_notification(self, request):
+        return Issue.objects.filter(assigned_to__username=request.user)
+
     def get_context(self, request):
         context = {}
         context['user'] = self.get_user(request)
+        context['notifications'] = self.get_notification(request)
         return context
 
 
