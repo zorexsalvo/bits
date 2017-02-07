@@ -3,6 +3,9 @@ from django.contrib.auth.models import User as AuthUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
 
@@ -42,6 +45,17 @@ class User(models.Model):
         return '{} {}'.format(self.first_name, self.last_name)
 
 
+class Notification(models.Model):
+    CATEGORY = (('ISSUE', 'Issue'),
+                ('THREAD', 'Thread'))
+
+    user = models.ForeignKey(User, related_name='notifications')
+    category = models.CharField(max_length=200, choices=CATEGORY, default='ISSUE')
+    title = models.CharField(max_length=200)
+    url = models.CharField(max_length=200)
+    read = models.BooleanField()
+
+
 class Issue(models.Model):
     PRIORITY = (('LOW', 'Low'),
                 ('NORMAL', 'Normal'),
@@ -66,7 +80,16 @@ class Issue(models.Model):
 
     def save(self, *args, **kwargs):
         super(Issue, self).save(*args, **kwargs)
-        Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
+        issue = Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
+
+        url = '/issue/{}/thread/'.format(self.id)
+        title = '{} assigned you in an issue.'.format(self.created_by)
+
+        Notification.objects.create(user=self.assigned_to,
+                                    category='ISSUE',
+                                    title=title,
+                                    url=url,
+                                    read=False)
 
 
 class Thread(models.Model):

@@ -24,6 +24,13 @@ def logout_view(request):
     return HttpResponseRedirect('/login/user/')
 
 
+def notification_view(request, notification_id):
+    notification = Notification.objects.filter(id=notification_id)
+    notification.update(read=True)
+
+    return HttpResponseRedirect(notification.first().url)
+
+
 class UsernameLoginView(TemplateView):
     form_class = UsernameForm
     template_name = 'security/user_login.html'
@@ -88,13 +95,14 @@ class AdministratorView(TemplateView):
         return  User.objects.filter(username=request.user).first()
 
     def get_notification(self, request):
-        return Issue.objects.filter(assigned_to__username=request.user)
+        return Notification.objects.filter(user__username=request.user).order_by('-id')
 
     def get_context(self, request):
         context = {}
         context['companies'] = self.get_companies()
         context['user'] = self.get_user(request)
         context['notifications'] = self.get_notification(request)
+        context['unread'] = context['notifications'].filter(read=False)
         return context
 
 
@@ -280,8 +288,6 @@ class IssueView(UserView):
         issue = Issue.objects.filter(id=issue.id).first()
         sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
         sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
-
-        print(sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token))
 
         sms_payload = {
             'address': issue.assigned_to.mobile_number,

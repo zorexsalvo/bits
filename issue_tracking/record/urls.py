@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'login/user/$', UsernameLoginView.as_view(), name='username_login'),
     url(r'login/$', LoginView.as_view(), name='login'),
     url(r'logout/$', login_required(logout_view), name='logout'),
+    url(r'notifications/(?P<notification_id>\d+)/$', notification_view, name='notification'),
     url(r'companies/create/$', login_required(CreateCompany.as_view()), name='create_company'),
     url(r'companies/(?P<company_id>\d+)/trackers/create/$', login_required(CreateTracker.as_view()), name='create_tracker'),
     url(r'employees/$', login_required(ViewEmployee.as_view()), name='view_employee'),
