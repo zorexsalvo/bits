@@ -25,10 +25,16 @@ def logout_view(request):
 
 
 def notification_view(request, notification_id):
+
     notification = Notification.objects.filter(id=notification_id)
     notification.update(read=True)
 
-    return HttpResponseRedirect(notification.first().url)
+    url = notification.first().url
+
+    if request.GET.get('q'):
+        url = url + request.GET.get('q')
+
+    return HttpResponseRedirect(url)
 
 
 class UsernameLoginView(TemplateView):
@@ -251,6 +257,42 @@ class DeleteEmployee(AdministratorView):
         user = User.objects.filter(id=employee_id)
         user.delete()
         return HttpResponseRedirect(url)
+
+
+class AdminThreadView(AdministratorView):
+    template_name = 'administrator/thread.html'
+    form_class = ThreadForm
+
+    def get_object(self, issue_id):
+        try:
+            return Issue.objects.get(id=issue_id)
+        except Issue.DoesNotExist:
+            None
+
+    def get(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        context['form'] = self.form_class()
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+
+        print('===================')
+        print('Should Be here?')
+        return render(request, self.template_name, context)
+
+    def post(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+        context['form'] = form
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            data['issue'] = Issue.objects.get(id=issue_id)
+            data['created_by'] = User.objects.get(username=request.user)
+            Thread.objects.create(**data)
+
+        return render(request, self.template_name, context)
 
 
 class UserView(TemplateView):

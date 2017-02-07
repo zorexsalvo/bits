@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'dashboard/$', login_required(DashboardView.as_view()), name='dashboard'),
     url(r'issue/$', login_required(IssueView.as_view()), name='issue'),
     url(r'issue/(?P<issue_id>\d+)/thread/$', login_required(ThreadView.as_view()), name='thread'),
+    url(r'issue/(?P<issue_id>\d+)/thread/administrator/$', login_required(AdminThreadView.as_view()), name='admin_thread'),
     url(r'user/$', login_required(UserDirectoryView.as_view()), name='user_directory'),
     url(r'check/$', login_required(CheckView.as_view()), name='check'),
     url(r'v1/notify_uri', SMSView.as_view(), name='notify_uri'),
