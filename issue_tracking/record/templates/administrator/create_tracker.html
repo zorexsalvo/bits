@@ -10,7 +10,7 @@
         </header>
 
         <aside class="main-sidebar">
-            {% include 'administrator/navigation.html' %}
+            {% include 'administrator/navigation.html' with active_tab='open_companies' %}
         </aside>
 
         <div class="content-wrapper">
@@ -19,7 +19,7 @@
                     Create Tracker
                 </h1>
                 <ol class="breadcrumb">
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+                    <li><a href="/companies/create/"><i class="fa fa-dashboard"></i> Admin</a></li>
                     <li class="active">Tracker</li>
                 </ol>
             </section>

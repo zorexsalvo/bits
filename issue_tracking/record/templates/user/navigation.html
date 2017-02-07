@@ -26,13 +26,13 @@
     <ul class="sidebar-menu">
         <li class="header">MAIN NAVIGATION</li>
 
-        <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li class="{% if active_tab == 'dashboard' %}active{% endif %}"><a href="/dashboard/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 
-        <li><a href="/issue/"><i class="fa fa-files-o"></i> <span>View Issues</span></a></li>
+        <li class="{% if active_tab == 'issue' %}active{% endif %}"><a href="/issue/"><i class="fa fa-files-o"></i> <span>View Issues</span></a></li>
 
-        <li><a href="/user/"><i class="fa fa-user"></i> <span>User</span></a></li>
+        <li class="{% if active_tab == 'user' %}active{% endif %}"><a href="/user/"><i class="fa fa-user"></i> <span>User</span></a></li>
 
         <li class="header">UTILITIES</li>
-        <li><a href="/check/"><i class="fa fa-circle-o text-red"></i> <span>Check Issue Status</span></a></li>
+        <li class="{% if active_tab == 'check' %}active{% endif %}"><a href="/check/"><i class="fa fa-circle-o text-red"></i> <span>Check Issue Status</span></a></li>
     </ul>
 </section>
