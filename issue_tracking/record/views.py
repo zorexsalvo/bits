@@ -275,8 +275,6 @@ class AdminThreadView(AdministratorView):
         context['issue'] = self.get_object(issue_id)
         context['thread'] = Thread.objects.filter(issue__id=issue_id)
 
-        print('===================')
-        print('Should Be here?')
         return render(request, self.template_name, context)
 
     def post(self, request, issue_id, *args, **kwargs):
@@ -300,7 +298,7 @@ class UserView(TemplateView):
         return  User.objects.filter(username=request.user).first()
 
     def get_notification(self, request):
-        return Issue.objects.filter(assigned_to__username=request.user)
+        return Notification.objects.filter(user__username=request.user).order_by('-id')
 
     def get_context(self, request):
         context = {}
