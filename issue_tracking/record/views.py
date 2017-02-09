@@ -323,7 +323,7 @@ class IssueView(UserView):
 
     def get_issue(self, user):
         if user:
-            return Issue.objects.filter(created_by__company__id=user.company.id)
+            return Issue.objects.filter(created_by__company__id=user.company.id).order_by('id')
         return Issue.objects.all()
 
     def send_sms_notification(self, issue):
@@ -336,7 +336,7 @@ class IssueView(UserView):
         if sms_notification is not None:
             sms_payload = {
                 'address': issue.assigned_to.mobile_number,
-                'message': sms_notification.sms
+                'message': sms_notification.sms.format(reference_id=issue.reference_id, title=issue.title, created_by=issue.created_by)
             }
 
             try:
