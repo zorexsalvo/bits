@@ -7,4 +7,5 @@ admin.site.register(Thread)
 admin.site.register(User)
 admin.site.register(Tracker)
 admin.site.register(Notification)
+admin.site.register(SmsNotification)
 admin.site.site_header = 'Issue Tracking System'

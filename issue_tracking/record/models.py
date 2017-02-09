@@ -121,3 +121,14 @@ class Tracker(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class SmsNotification(models.Model):
+    PRIORITY = (('LOW', 'Low'),
+                ('NORMAL', 'Normal'),
+                ('HIGH', 'High'),
+                ('EMERGENCY', 'Emergency'))
+
+    sms = models.TextField()
+    priority = models.CharField(max_length=200, choices=PRIORITY)
+    active = models.BooleanField()

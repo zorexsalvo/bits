@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 
 from .forms import *
-from .models import Company, User, Tracker
+from .models import Company, User, Tracker, SmsNotification
 from issue_tracker.config import sys_config
 
 import json
@@ -304,6 +304,7 @@ class UserView(TemplateView):
         context = {}
         context['user'] = self.get_user(request)
         context['notifications'] = self.get_notification(request)
+        context['unread'] = context['notifications'].filter(read=False)
         return context
 
 
@@ -329,18 +330,21 @@ class IssueView(UserView):
         sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
         sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
 
-        sms_payload = {
-            'address': issue.assigned_to.mobile_number,
-            'message': '[New Issue Alert] {}'.format(issue)
-        }
+        sms_notification = SmsNotification.objects.filter(priority=issue.priority, active=True).first()
 
-        try:
-            response = requests.post(sms_uri, data=sms_payload)
-            logging.info(response.text)
-        except requests.exceptions.ProxyError as e:
-            logging.error(e)
-        except requests.exceptions.ConnectionError as f:
-            logging.error(f)
+        if sms_notification is not None:
+            sms_payload = {
+                'address': issue.assigned_to.mobile_number,
+                'message': sms_notification.sms
+            }
+
+            try:
+                response = requests.post(sms_uri, data=sms_payload)
+                logging.info(response.text)
+            except requests.exceptions.ProxyError as e:
+                logging.error(e)
+            except requests.exceptions.ConnectionError as f:
+                logging.error(f)
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
