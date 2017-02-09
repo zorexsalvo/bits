@@ -290,6 +290,7 @@ class AdminThreadView(AdministratorView):
             data['created_by'] = User.objects.get(username=request.user)
             Thread.objects.create(**data)
 
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -416,6 +417,7 @@ class ThreadView(UserView):
             data['created_by'] = User.objects.get(username=request.user)
             Thread.objects.create(**data)
 
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
