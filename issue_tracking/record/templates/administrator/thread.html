@@ -30,10 +30,23 @@
                                 <div class="user-block">
                                     <img class="img-circle img-bordered-sm" src="{{ issue.created_by.picture.url }}" alt="user image">
                                     <span class="username">
-                                        <a href="#">{{ issue.title }}</a>
+                                        <a href="#">
+                                        {% if issue.priority == 'LOW' %}
+                                            <span class="badge">
+                                        {% elif issue.priority == 'NORMAL' %}
+                                            <span class="badge bg-green">
+                                        {% elif issue.priority == 'HIGH' %}
+                                            <span class="badge bg-yellow">
+                                        {% else %}
+                                            <span class="badge bg-red">
+                                        {% endif %}
+                                            {{ issue.priority }}
+                                        </span>
+                                        Ticket #{{ issue.reference_id }}: {{ issue.title }}
+                                        </a>
                                     </span>
-                                    <span class="description">
-                                        {{ issue.reference_id }} - {{ issue.date_created }}
+                                    <span class="description" style="padding-top: 10px;">
+                                        Sent: {{ issue.date_created }}
                                     </span>
                                 </div>
                                 <!-- /.user-block -->
@@ -41,10 +54,12 @@
                                 <p>
                                     {{ issue.description }}
                                 </p>
+                                <br />
+                                <br />
                                 <ul class="list-inline">
-                                    <li><a href="#" class="link-black text-sm"><i class="fa fa-comments-o margin-r-5"></i> Created by {{ issue.created_by.first_name }} {{ issue.created_by.middle_name }} {{ issue.created_by.last_name }}</a></li>
+                                    <li><a href="#" class="link-black text-sm"><i class="fa fa-comments-o margin-r-5"></i> From: {{ issue.created_by.first_name }} {{ issue.created_by.middle_name }} {{ issue.created_by.last_name }}</a></li>
                                     <li class="pull-right">
-                                        <a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> Assigned to {{ issue.assigned_to.first_name }} {{ issue.assigned_to.middle_name }} {{ issue.assigned_to.last_name }}</a>
+                                        <a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> To: {{ issue.assigned_to.first_name }} {{ issue.assigned_to.middle_name }} {{ issue.assigned_to.last_name }}</a>
                                     </li>
                                 </ul>
                             </div>
