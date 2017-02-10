@@ -49,10 +49,10 @@
                                 <td>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</td>
                                 <td>{{ user.mobile_number }}</td>
                                 <td>
-                                    {% if user.access_token is None %}
-                                    <input type="checkbox" class="flat-red" disabled></td>
-                                    {% else %}
+                                    {% if user.access_token and user.access_token.strip %}
                                     <input type="checkbox" class="flat-red" checked disabled></td>
+                                    {% else %}
+                                    <input type="checkbox" class="flat-red" disabled></td>
                                     {% endif %}
                             </tr>
                             {% endfor %} {% endif %}
