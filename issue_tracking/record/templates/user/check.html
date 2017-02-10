@@ -49,7 +49,7 @@
                                         </div>
                                         <!-- /.widget-user-image -->
                                         <h3 class="widget-user-username">{{ record.created_by }}</h3>
-                                        <h5 class="widget-user-desc">Lead Developer</h5>
+                                        <h5 class="widget-user-desc">{{ record }}</h5>
                                     </div>
                                     <div class="box-footer no-padding">
                                         <ul class="nav nav-stacked">
@@ -58,6 +58,7 @@
                                             <li><a href="#">Sent <span class="pull-right badge bg-green">{{ record.date_created }}</span></a></li>
                                             <li><a href="#">Replies <span class="pull-right badge bg-red">{{ record.threads.count }}</span></a></li>
                                         </ul>
+                                        <a href="/issue/{{ record.id }}/thread/" class="btn btn-block">See More</a>
                                     </div>
                                 </div>
                             </div>
