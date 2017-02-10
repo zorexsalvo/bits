@@ -49,6 +49,7 @@
                                             <th>From</th>
                                             <th>Priority</th>
                                             <th>Assigned To</th>
+                                            <th>Date</th>
                                         </tr>
                                         {% if issues %} {% for issue in issues %}
                                         <tr>
@@ -69,6 +70,7 @@
                                                 </span>
                                             </td>
                                             <td>{{ issue.assigned_to }}</td>
+                                            <td>{{ issue.date_created|date:"m-d-Y P" }}</td>
                                         </tr>
                                         {% endfor %} {% endif %}
                                     </table>
