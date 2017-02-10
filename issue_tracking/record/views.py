@@ -381,9 +381,21 @@ class UserDirectoryView(UserView):
 
 class CheckView(UserView):
     template_name = 'user/check.html'
+    form_class = CheckForm
 
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+
+        if form.is_valid():
+            context['record'] = Issue.objects.filter(reference_id__icontains=form.cleaned_data.get('keyword')).first()
+
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 

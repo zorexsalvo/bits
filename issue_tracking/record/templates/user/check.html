@@ -29,13 +29,39 @@
                             <div class="box-header">
                             </div>
                             <div class="box-body">
-                                <div class="input-group input-group-md">
-                                    <input type="text" class="form-control">
-                                        <span class="input-group-btn">
-                                            <button type="button" class="btn btn-info btn-flat">Go!</button>
-                                        </span>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-md">
+                                        {{ form.keyword }}
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-info btn-flat">Go!</button>
+                                            </span>
+                                    </div>
+                                </form>
+                            </div>
+                            {% if record %}
+                            <div class="box-footer">
+                                <div class="box box-widget widget-user-2">
+                                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                                    <div class="widget-user-header bg-blue">
+                                        <div class="widget-user-image">
+                                            <img class="img-circle" src="{{ record.created_by.picture.url }}" alt="User Avatar">
+                                        </div>
+                                        <!-- /.widget-user-image -->
+                                        <h3 class="widget-user-username">{{ record.created_by }}</h3>
+                                        <h5 class="widget-user-desc">Lead Developer</h5>
+                                    </div>
+                                    <div class="box-footer no-padding">
+                                        <ul class="nav nav-stacked">
+                                            <li><a href="#">Priority <span class="pull-right badge bg-blue">{{ record.priority }}</span></a></li>
+                                            <li><a href="#">Remark <span class="pull-right badge bg-aqua">{{ record.remark }}</span></a></li>
+                                            <li><a href="#">Sent <span class="pull-right badge bg-green">{{ record.date_created }}</span></a></li>
+                                            <li><a href="#">Replies <span class="pull-right badge bg-red">{{ record.threads.count }}</span></a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

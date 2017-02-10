@@ -116,3 +116,7 @@ class ThreadForm(forms.ModelForm):
         widgets = {
             'note': forms.TextInput(attrs={'placeholder': 'Type message...', 'class': 'form-control'}),
         }
+
+
+class CheckForm(forms.Form):
+    keyword = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Please input the Refence ID of the issue you want to check.', 'class': 'form-control'}))
