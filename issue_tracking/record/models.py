@@ -104,6 +104,8 @@ class Thread(models.Model):
     def save(self, *args, **kwargs):
         super(Thread, self).save(*args, **kwargs)
 
+        tags = []
+
         if not self.issue.created_by == self.created_by:
             url = '/issue/{}/thread/'.format(self.issue.id)
             title = '{} replied to your issue.'.format(self.created_by)
@@ -113,6 +115,23 @@ class Thread(models.Model):
                                         title=title,
                                         url=url,
                                         read=False)
+
+            for tag in self.note.split():
+                if '@' in tag:
+                    print(tag)
+                    if User.objects.filter(username__username__icontains=tag[1:]).exists():
+                        print('alrigh')
+
+                        title = '{} tagged you in an issue.'.format(self.created_by)
+                        user = User.objects.filter(username__username__icontains=tag[1:]).first()
+
+                        Notification.objects.create(user=user,
+                                                    category='THREAD',
+                                                    title=title,
+                                                    url=url,
+                                                    read=False)
+                    else:
+                        print('============')
 
 
 class Tracker(models.Model):
