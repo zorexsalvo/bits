@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block content %}
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
 
         <header class="main-header">
@@ -10,7 +10,7 @@
         </header>
 
         <aside class="main-sidebar">
-            {% include 'administrator/navigation.html' %}
+            {% include 'administrator/navigation.html' with active_tab='create_company' %}
         </aside>
 
         <div class="content-wrapper">
@@ -19,8 +19,7 @@
                     Create Company
                 </h1>
                 <ol class="breadcrumb">
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
-                    <li class="active">Company</li>
+                    <li><a href="/companies/create/"><i class="fa fa-dashboard"></i> Admin</a></li>
                 </ol>
             </section>
 

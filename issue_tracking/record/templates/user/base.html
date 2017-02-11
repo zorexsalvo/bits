@@ -8,6 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Issue Tracking System | Dashboard</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <script src="{% static 'pace/pace.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pace/pace.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'fonts/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'fonts/ionicons.min.css' %}">
@@ -15,6 +17,7 @@
     <link rel="stylesheet" href="{% static 'dist/css/skins/_all-skins.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/iCheck/flat/blue.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/morris/morris.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/jvectormap/jquery-jvectormap-1.2.2.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/datepicker/datepicker3.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css' %}">
@@ -30,6 +33,7 @@
 <script>$.widget.bridge('uibutton', $.ui.button);</script>
 <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'bootstrap/js/raphael-min.js' %}"></script>
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
 <script src="{% static 'plugins/morris/morris.min.js' %}"></script>
 <script src="{% static 'plugins/sparkline/jquery.sparkline.min.js' %}"></script>
 <script src="{% static 'plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>

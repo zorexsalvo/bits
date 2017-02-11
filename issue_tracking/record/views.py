@@ -1,19 +1,40 @@
 import time
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth import login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 
 from .forms import *
-from .models import Company, User, Tracker
+from .models import Company, User, Tracker, SmsNotification
+from issue_tracker.config import sys_config
 
+import json
+import requests
+import logging
+
+GLOBE_LABS_CONFIG_SECTION = 'GlobeLabs'
 
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/user/')
+
+
+def notification_view(request, notification_id):
+
+    notification = Notification.objects.filter(id=notification_id)
+    notification.update(read=True)
+
+    url = notification.first().url
+
+    if request.GET.get('q'):
+        url = url + request.GET.get('q')
+
+    return HttpResponseRedirect(url)
 
 
 class UsernameLoginView(TemplateView):
@@ -32,7 +53,7 @@ class UsernameLoginView(TemplateView):
     def get(self, request, *args, **kwargs):
         form = self.form_class()
         if request.user.is_authenticated():
-            url = reverse('create_company')
+            url = reverse('dashboard')
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
 
@@ -56,7 +77,7 @@ class LoginView(TemplateView):
         form = self.form_class({'username': request.GET.get('username')})
 
         if request.user.is_authenticated():
-            url = reverse('create_company')
+            url = reverse('dashboard')
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form, 'user': user})
 
@@ -64,7 +85,7 @@ class LoginView(TemplateView):
         user = User.objects.filter(username__username=request.GET.get('username')).first()
 
         form = self.form_class(request.POST)
-        url = reverse('create_company')
+        url = reverse('dashboard')
         if form.is_valid():
             user = form.login(request)
             _login = login(request, user)
@@ -79,10 +100,15 @@ class AdministratorView(TemplateView):
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
 
+    def get_notification(self, request):
+        return Notification.objects.filter(user__username=request.user).order_by('-id')
+
     def get_context(self, request):
         context = {}
         context['companies'] = self.get_companies()
         context['user'] = self.get_user(request)
+        context['notifications'] = self.get_notification(request)
+        context['unread'] = context['notifications'].filter(read=False)
         return context
 
 
@@ -109,7 +135,7 @@ class CreateCompany(AdministratorView):
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
 
-        context['form'] = form
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -161,7 +187,7 @@ class CreateEmployee(AdministratorView):
             user.save()
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
-        context['form'] = form
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -185,7 +211,7 @@ class CreateTracker(AdministratorView):
             context['form'] = self.form_class()
             return render(request, self.template_name, context)
 
-        context['form'] = form
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
@@ -216,7 +242,7 @@ class UpdateEmployee(AdministratorView):
                 mobile_number = form.cleaned_data.get('mobile_number'),
                 company = form.cleaned_data.get('company'),
                 position = form.cleaned_data.get('position'),
-                picture = form.cleaned_data.get('picture')
+                picture = '/images/' + str(form.cleaned_data.get('picture'))
             )
             context['form'] = form
             return render(request, self.template_name, context)
@@ -233,13 +259,53 @@ class DeleteEmployee(AdministratorView):
         return HttpResponseRedirect(url)
 
 
+class AdminThreadView(AdministratorView):
+    template_name = 'administrator/thread.html'
+    form_class = ThreadForm
+
+    def get_object(self, issue_id):
+        try:
+            return Issue.objects.get(id=issue_id)
+        except Issue.DoesNotExist:
+            None
+
+    def get(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        context['form'] = self.form_class()
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+        context['form'] = form
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            data['issue'] = Issue.objects.get(id=issue_id)
+            data['created_by'] = User.objects.get(username=request.user)
+            Thread.objects.create(**data)
+
+        context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+
 class UserView(TemplateView):
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
 
+    def get_notification(self, request):
+        return Notification.objects.filter(user__username=request.user).order_by('-id')
+
     def get_context(self, request):
         context = {}
         context['user'] = self.get_user(request)
+        context['notifications'] = self.get_notification(request)
+        context['unread'] = context['notifications'].filter(read=False)
         return context
 
 
@@ -253,15 +319,54 @@ class DashboardView(UserView):
 
 class IssueView(UserView):
     template_name = 'user/issue.html'
+    form_class = IssueForm
 
     def get_issue(self, user):
         if user:
-            return Issue.objects.filter(created_by__company__id=user.company.id)
+            return Issue.objects.filter(created_by__company__id=user.company.id).order_by('id')
         return Issue.objects.all()
 
+    def send_sms_notification(self, issue):
+        issue = Issue.objects.filter(id=issue.id).first()
+        sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+
+        sms_notification = SmsNotification.objects.filter(priority=issue.priority, active=True).first()
+
+        if sms_notification is not None:
+            sms_payload = {
+                'address': issue.assigned_to.mobile_number,
+                'message': sms_notification.sms.format(reference_id=issue.reference_id, title=issue.title, created_by=issue.created_by)
+            }
+
+            try:
+                response = requests.post(sms_uri, data=sms_payload)
+                logging.info(response.text)
+            except requests.exceptions.ProxyError as e:
+                logging.error(e)
+            except requests.exceptions.ConnectionError as f:
+                logging.error(f)
+
     def get(self, request, *args, **kwargs):
+        form = self.form_class()
         context = self.get_context(request)
         context['issues'] = self.get_issue(context['user'])
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST or None)
+        context = self.get_context(request)
+        context['issues'] = self.get_issue(context['user'])
+        context['form'] = form
+
+        if form.is_valid():
+            url = reverse('issue')
+            data = form.cleaned_data
+            data['created_by'] = User.objects.get(username=request.user)
+            issue = Issue.objects.create(**data)
+            self.send_sms_notification(issue)
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
 
@@ -270,12 +375,75 @@ class UserDirectoryView(UserView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['users'] = User.objects.all()
         return render(request, self.template_name, context)
 
 
 class CheckView(UserView):
     template_name = 'user/check.html'
+    form_class = CheckForm
 
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+
+        if form.is_valid():
+            context['record'] = Issue.objects.filter(reference_id__icontains=form.cleaned_data.get('keyword')).first()
+
+        context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+
+class ThreadView(UserView):
+    template_name = 'user/thread.html'
+    form_class = ThreadForm
+
+    def get_object(self, issue_id):
+        try:
+            return Issue.objects.get(id=issue_id)
+        except Issue.DoesNotExist:
+            None
+
+    def get(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        context['form'] = self.form_class()
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+        return render(request, self.template_name, context)
+
+    def post(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        form = self.form_class(request.POST or None)
+        context['form'] = form
+        context['issue'] = self.get_object(issue_id)
+        context['thread'] = Thread.objects.filter(issue__id=issue_id)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            data['issue'] = Issue.objects.get(id=issue_id)
+            data['created_by'] = User.objects.get(username=request.user)
+            Thread.objects.create(**data)
+
+        context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SMSView(View):
+    def get(self, request, *args, **kwargs):
+        access_token = self.request.GET.get('access_token')
+        subscriber_number = self.request.GET.get('subscriber_number')
+
+        User.objects.filter(mobile_number__endswith=subscriber_number).update(access_token=access_token)
+        return HttpResponse()
+
+    def post(self, request, *args, **kwargs):
+        unsubscribed = json.loads(self.request.body).get('unsubscribed')
+
+        User.objects.filter(mobile_number__endswith=unsubscribed.get('subscriber_number')).update(access_token=None)
+        return HttpResponse()

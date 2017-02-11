@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
 
         <header class="main-header">
@@ -15,7 +15,7 @@
         </header>
 
         <aside class="main-sidebar">
-            {% include 'administrator/navigation.html' %}
+            {% include 'administrator/navigation.html' with active_tab='create_employee' %}
         </aside>
 
         <div class="content-wrapper">
@@ -24,8 +24,8 @@
                     Create Employee
                 </h1>
                 <ol class="breadcrumb">
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
-                    <li class="active">Employee</li>
+                    <li><a href="/companies/create/"><i class="fa fa-dashboard"></i> Admin</a></li>
+                    <li class="active">Create Employee</li>
                 </ol>
             </section>
 
@@ -44,8 +44,7 @@
                             {% else %}
                                 <div class="alert alert-success alert-dismissible">
                                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                    <h4><i class="icon fa fa-check"></i> Success!</h4>
-                                    Text INFO to 21584652 (Cross-telco: 29290584652) to subscribe to SMS Notification.
+                                    Text INFO to 21584020 (Cross-telco: 29290584652) to subscribe to SMS Notification.
                                 </div>
                             {% endif %}
                         {% endif %}

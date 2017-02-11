@@ -3,6 +3,9 @@ from django.contrib.auth.models import User as AuthUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
 
@@ -35,10 +38,22 @@ class User(models.Model):
     type = models.CharField(max_length=200, choices=TYPE)
     date_created = models.DateTimeField(auto_now_add=True)
     picture = models.ImageField(upload_to='images')
+    access_token = models.CharField(max_length=200, blank=True, null=True)
     created_by = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return '{}, {} {}'.format(self.last_name, self.first_name, self.middle_name)
+        return '{} {}'.format(self.first_name, self.last_name)
+
+
+class Notification(models.Model):
+    CATEGORY = (('ISSUE', 'Issue'),
+                ('THREAD', 'Thread'))
+
+    user = models.ForeignKey(User, related_name='notifications')
+    category = models.CharField(max_length=200, choices=CATEGORY, default='ISSUE')
+    title = models.CharField(max_length=200)
+    url = models.CharField(max_length=200)
+    read = models.BooleanField()
 
 
 class Issue(models.Model):
@@ -55,6 +70,7 @@ class Issue(models.Model):
     assigned_to = models.ForeignKey(User, related_name='issues')
     priority = models.CharField(max_length=200, choices=PRIORITY, default='NORMAL')
     remark = models.CharField(max_length=200, choices=REMARKS, default='OPEN')
+    description = models.TextField()
 
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='issues_created')
@@ -66,26 +82,37 @@ class Issue(models.Model):
         super(Issue, self).save(*args, **kwargs)
         Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
 
+        url = '/issue/{}/thread/'.format(self.id)
+        title = '{} assigned you in an issue.'.format(self.created_by)
 
-class Ticket(models.Model):
-    issue = models.ForeignKey(Issue, related_name='tickets')
+        Notification.objects.create(user=self.assigned_to,
+                                    category='ISSUE',
+                                    title=title,
+                                    url=url,
+                                    read=False)
+
+
+class Thread(models.Model):
+    issue = models.ForeignKey(Issue, related_name='threads')
     note = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(max_length=200)
+    created_by = models.ForeignKey(User, related_name='threads_created')
 
     def __unicode__(self):
-        return '{} - {}'.format(self.reference_id, self.assigned_to)
+        return str(self.issue)
 
+    def save(self, *args, **kwargs):
+        super(Thread, self).save(*args, **kwargs)
 
-class Repository(models.Model):
-    issue = models.ForeignKey(Issue, related_name='issue_repository')
-    ticket = models.ForeignKey(Ticket, related_name='ticket_repository')
+        if not self.issue.created_by == self.created_by:
+            url = '/issue/{}/thread/'.format(self.issue.id)
+            title = '{} replied to your issue.'.format(self.created_by)
 
-    class Meta:
-        verbose_name_plural = 'Repositories'
-
-    def __unicode__(self):
-        return self.issue
+            Notification.objects.create(user=self.issue.created_by,
+                                        category='THREAD',
+                                        title=title,
+                                        url=url,
+                                        read=False)
 
 
 class Tracker(models.Model):
@@ -94,3 +121,14 @@ class Tracker(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class SmsNotification(models.Model):
+    PRIORITY = (('LOW', 'Low'),
+                ('NORMAL', 'Normal'),
+                ('HIGH', 'High'),
+                ('EMERGENCY', 'Emergency'))
+
+    sms = models.TextField()
+    priority = models.CharField(max_length=200, choices=PRIORITY)
+    active = models.BooleanField()

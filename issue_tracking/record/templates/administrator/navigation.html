@@ -26,9 +26,9 @@
     <ul class="sidebar-menu">
         <li class="header">COMPANY</li>
 
-        <li><a href="/companies/create/"><i class="fa fa-edit"></i> <span>Create Company</span></a></li>
+        <li class="{% if active_tab == 'create_company' %}active{% endif %}"><a href="/companies/create/"><i class="fa fa-edit"></i> <span>Create Company</span></a></li>
 
-        <li class="treeview">
+        <li class="treeview {% if active_tab == 'open_companies' %} active{% endif %}">
             <a href="#">
                 <i class="fa fa-share"></i> <span>Open Companies</span>
                 <span class="pull-right-container">
@@ -76,8 +76,8 @@
         </li>
 
         <li class="header">EMPLOYEE</li>
-        <li><a href="/employees/create/"><i class="fa fa-edit"></i> <span>Create Employee</span></a></li>
+        <li class="{% if active_tab == 'create_employee' %}active{% endif %}"><a href="/employees/create/"><i class="fa fa-edit"></i> <span>Create Employee</span></a></li>
 
-        <li><a href="/employees/"><i class="fa fa-table"></i> <span>View Employees</span></a></li>
+        <li class="{% if active_tab == 'employee' %}active{% endif %}"><a href="/employees/"><i class="fa fa-table"></i> <span>View Employees</span></a></li>
     </ul>
 </section>

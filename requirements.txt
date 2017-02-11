@@ -2,3 +2,5 @@ Django==1.10.1
 hashids==1.1.0
 Pillow==3.4.2
 uWSGI==2.0.14
+six==1.10
+requests==2.13.0

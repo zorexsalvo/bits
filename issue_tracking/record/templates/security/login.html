@@ -28,7 +28,7 @@
                     {{ form.username.as_hidden }}
                     {{ form.password }}
                     <div class="input-group-btn">
-                        <button type="submit" class="btn"><i class="fa fa-arrow-right text-muted"></i></button>
+                        <button type="submit" class="btn shake"><i class="fa fa-arrow-right text-muted"></i></button>
                     </div>
                 </div>
             </form>
@@ -41,13 +41,25 @@
     </div>
 
     <div class="lockscreen-footer text-center">
-       <strong>Copyright &copy; 2015-2016 <a href="#">BITS Device</a>.</strong><br/>All rights reserved.
-       Developed by <strong><a href="https://github.com/zorexsalvo/issue-tracking-system">BITS Team</a></strong>.
+       <strong>Copyright &copy; 2016-2017 <a href="#">BITS Device</a>.</strong><br/>All rights reserved.
+       Developed by <strong><a href="#">BITS Team</a></strong>.
     </div>
 
     </div>
+
+{% block js %}
+    {{ block.super }}
+    {% if form.errors %}
+    <script>
+        $(document).ready(function(){
+            $(".shake").effect( "shake", {times:3}, 500);
+        });
+    </script>
+    {% endif %}
+{% endblock js %}
 
 </body>
+
 {% endblock content %}
 
 </html>

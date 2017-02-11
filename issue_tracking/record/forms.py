@@ -99,4 +99,24 @@ class TrackerForm(forms.Form):
 class IssueForm(forms.ModelForm):
     class Meta:
         model = Issue
-        exclude = ('reference_id',)
+        exclude = ['reference_id', 'date_created', 'created_by']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Title', 'class': 'form-control'}),
+            'assigned_to': forms.Select(attrs={'class': 'form-control select2'}),
+            'priority': forms.Select(attrs={'class': 'form-control'}),
+            'remark': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class ThreadForm(forms.ModelForm):
+    class Meta:
+        model = Thread
+        fields = ['note',]
+        widgets = {
+            'note': forms.TextInput(attrs={'placeholder': 'Type message...', 'class': 'form-control'}),
+        }
+
+
+class CheckForm(forms.Form):
+    keyword = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Please input the Refence ID of the issue you want to check.', 'class': 'form-control'}))

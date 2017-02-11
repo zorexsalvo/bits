@@ -1,0 +1,129 @@
+{% extends 'administrator/base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<body class="hold-transition skin-purple sidebar-mini">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'administrator/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'administrator/navigation.html' %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1><br/></h1>
+                <ol class="breadcrumb">
+                    <li><a href="/companies/create/"><i class="fa fa-dashboard"></i> Admin</a></li>
+                    <li class="active">Thread</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-body">
+                                <div class="user-block">
+                                    <img class="img-circle img-bordered-sm" src="{{ issue.created_by.picture.url }}" alt="user image">
+                                    <span class="username">
+                                        <a href="#">
+                                        {% if issue.priority == 'LOW' %}
+                                            <span class="badge">
+                                        {% elif issue.priority == 'NORMAL' %}
+                                            <span class="badge bg-green">
+                                        {% elif issue.priority == 'HIGH' %}
+                                            <span class="badge bg-yellow">
+                                        {% else %}
+                                            <span class="badge bg-red">
+                                        {% endif %}
+                                            {{ issue.priority }}
+                                        </span>
+                                        Issue {{ issue.reference_id }}: {{ issue.title }}
+                                        </a>
+                                    </span>
+                                    <span class="description" style="padding-top: 10px;">
+                                        Sent: {{ issue.date_created }}
+                                    </span>
+                                </div>
+                                <!-- /.user-block -->
+                                <br>
+                                <p>
+                                    {{ issue.description }}
+                                </p>
+                                <br />
+                                <br />
+                                <ul class="list-inline">
+                                    <li><a href="#" class="link-black text-sm"><i class="fa fa-comments-o margin-r-5"></i> From: {{ issue.created_by.first_name }} {{ issue.created_by.middle_name }} {{ issue.created_by.last_name }}</a></li>
+                                    <li class="pull-right">
+                                        <a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> To: {{ issue.assigned_to.first_name }} {{ issue.assigned_to.middle_name }} {{ issue.assigned_to.last_name }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="box-footer">
+                                <div>
+                                    <div class="box-header">
+                                    </div>
+                                    {% regroup thread by date_created.date as thread_list %}
+                                    {% for comment in thread_list %}
+                                        <div class="box-body chat">
+
+                                            <div class="item text-center">
+                                                <br/> <br/>
+                                                <p class="message">
+                                                    <a href="#" class="name">
+                                                        <small class="text-muted"><i class="fa fa-calendar-o"></i> {{ comment.grouper }}</small>
+                                                    </a>
+                                                </p>
+                                            </div>
+
+                                            {% for comment in comment.list %}
+                                            <div class="item">
+                                                <img src="{{ comment.created_by.picture.url }}" alt="user image" class="offline">
+
+                                                <p class="message">
+                                                    <a href="#" class="name">
+                                                        <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> {{ comment.date_created.time }}</small>
+                                                        {{ comment.created_by.first_name }} {{ comment.created_by.middle_name }} {{ comment.created_by.last_name}}
+                                                    </a>
+                                                    {{ comment.note }}
+                                                </p>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+
+                                    <div class="box-footer">
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <div class="input-group">
+                                                {{ form.note }}
+                                                <div class="input-group-btn">
+                                                    <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+{% block footer %}
+{{ block.super }}
+{% endblock footer %}
+
+{% block js %}
+{{ block.super }}
+{% endblock js %}
+
+</body>
+{% endblock content %}
