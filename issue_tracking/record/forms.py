@@ -48,7 +48,7 @@ class CompanyForm(forms.Form):
 
 class UserForm(forms.Form):
     SEX = (('MALE', 'Male',), ('FEMALE', 'Female',))
-    TYPE = (('ADMIN', 'Admin'),
+    TYPE = (('ADMINISTRATOR', 'Admin'),
             ('EMPLOYEE', 'Employee'))
 
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username', 'class': 'form-control'}))

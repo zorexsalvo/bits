@@ -13,6 +13,10 @@ from .forms import *
 from .models import Company, User, Tracker, SmsNotification
 from issue_tracker.config import sys_config
 
+from issue_tracker.roles import Administrator, Employee
+from rolepermissions.mixins import HasRoleMixin
+
+
 import json
 import requests
 import logging
@@ -93,7 +97,8 @@ class LoginView(TemplateView):
         return render(request, self.template_name, {'form': form, 'user':user})
 
 
-class AdministratorView(TemplateView):
+class AdministratorView(HasRoleMixin, TemplateView):
+    allowed_roles = [Administrator,]
     def get_companies(self):
         return Company.objects.all()
 
@@ -294,7 +299,9 @@ class AdminThreadView(AdministratorView):
         return render(request, self.template_name, context)
 
 
-class UserView(TemplateView):
+class EmployeeView(HasRoleMixin, TemplateView):
+    allowed_roles = [Employee,]
+
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
 
@@ -309,7 +316,7 @@ class UserView(TemplateView):
         return context
 
 
-class DashboardView(UserView):
+class DashboardView(EmployeeView):
     template_name = 'user/index.html'
 
     def get(self, request, *args, **kwargs):
@@ -317,7 +324,7 @@ class DashboardView(UserView):
         return render(request, self.template_name, context)
 
 
-class IssueView(UserView):
+class IssueView(EmployeeView):
     template_name = 'user/issue.html'
     form_class = IssueForm
 
@@ -370,7 +377,7 @@ class IssueView(UserView):
         return render(request, self.template_name, context)
 
 
-class UserDirectoryView(UserView):
+class UserDirectoryView(EmployeeView):
     template_name = 'user/user.html'
 
     def get(self, request, *args, **kwargs):
@@ -379,7 +386,7 @@ class UserDirectoryView(UserView):
         return render(request, self.template_name, context)
 
 
-class CheckView(UserView):
+class CheckView(EmployeeView):
     template_name = 'user/check.html'
     form_class = CheckForm
 
@@ -399,7 +406,7 @@ class CheckView(UserView):
         return render(request, self.template_name, context)
 
 
-class ThreadView(UserView):
+class ThreadView(EmployeeView):
     template_name = 'user/thread.html'
     form_class = ThreadForm
 

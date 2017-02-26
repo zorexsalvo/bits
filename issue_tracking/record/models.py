@@ -6,6 +6,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from issue_tracker.roles import Administrator, Employee
+
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
 
@@ -23,7 +25,7 @@ class Company(models.Model):
 class User(models.Model):
     SEX = (('MALE', 'Male'),
            ('FEMALE', 'Female'))
-    TYPE = (('ADMIN', 'Administrator'),
+    TYPE = (('ADMINISTRATOR', 'Administrator'),
             ('EMPLOYEE', 'Employee'))
 
     username = models.OneToOneField(AuthUser, related_name='auth_user')
@@ -40,6 +42,15 @@ class User(models.Model):
     picture = models.ImageField(upload_to='images')
     access_token = models.CharField(max_length=200, blank=True, null=True)
     created_by = models.CharField(max_length=200)
+
+    def save(self, *args, **kwargs):
+        role_map = {
+            'ADMINISTRATOR': Administrator,
+            'EMPLOYEE': Employee
+        }
+        target_role = role_map[self.type]
+        target_role.assign_role_to_user(self.username)
+        super(User, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)
@@ -130,8 +141,6 @@ class Thread(models.Model):
                                                     title=title,
                                                     url=url,
                                                     read=False)
-                    else:
-                        print('============')
 
 
 class Tracker(models.Model):
