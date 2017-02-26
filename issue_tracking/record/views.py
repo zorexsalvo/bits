@@ -203,12 +203,14 @@ class CreateTracker(AdministratorView):
     def get(self, request, company_id, *args, **kwargs):
         context = self.get_context(request)
         context['form'] = self.form_class()
+        context['company'] = Company.objects.get(id=company_id)
         return render(request, self.template_name, context)
 
     def post(self, request, company_id, *args, **kwargs):
         context = self.get_context(request)
         form = self.form_class(request.POST or None)
         context['request'] = 'POST'
+        context['company'] = Company.objects.get(id=company_id)
 
         if form.is_valid():
             tracker = Tracker.objects.create(name=form.cleaned_data.get('tracker'),
@@ -217,6 +219,59 @@ class CreateTracker(AdministratorView):
             return render(request, self.template_name, context)
 
         context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+
+class AdminIssueView(AdministratorView):
+    template_name = 'administrator/issue.html'
+    form_class = IssueForm
+
+    def get_issue(self, tracker_id):
+        return Issue.objects.filter(tracker__id=tracker_id)
+
+    def send_sms_notification(self, issue):
+        issue = Issue.objects.filter(id=issue.id).first()
+        sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+
+        sms_notification = SmsNotification.objects.filter(priority=issue.priority, active=True).first()
+
+        if sms_notification is not None:
+            sms_payload = {
+                'address': issue.assigned_to.mobile_number,
+                'message': sms_notification.sms.format(reference_id=issue.reference_id, title=issue.title, created_by=issue.created_by)
+            }
+
+            try:
+                response = requests.post(sms_uri, data=sms_payload)
+                logging.info(response.text)
+            except requests.exceptions.ProxyError as e:
+                logging.error(e)
+            except requests.exceptions.ConnectionError as f:
+                logging.error(f)
+
+    def get(self, request, tracker_id, *args, **kwargs):
+        form = self.form_class()
+        context = self.get_context(request)
+        context['issues'] = self.get_issue(tracker_id)
+        context['tracker'] = Tracker.objects.get(id=tracker_id)
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST or None)
+        context = self.get_context(request)
+        context['issues'] = self.get_issue(context['user'])
+        context['tracker'] = Tracker.objects.get(id=tracker_id)
+        context['form'] = form
+
+        if form.is_valid():
+            url = reverse('issue')
+            data = form.cleaned_data
+            data['created_by'] = User.objects.get(username=request.user)
+            issue = Issue.objects.create(**data)
+            self.send_sms_notification(issue)
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
 

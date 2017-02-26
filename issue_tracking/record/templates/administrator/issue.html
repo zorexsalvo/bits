@@ -1,22 +1,22 @@
 {% extends 'user/base.html' %} {% load staticfiles %} {% block content %}
 
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
 
         <header class="main-header">
-            {% include 'user/header.html' %}
+            {% include 'administrator/header.html' %}
         </header>
 
         <aside class="main-sidebar">
-            {% include 'user/navigation.html' with active_tab='issue' %}
+            {% include 'administrator/navigation.html' with active_tab='open_companies' %}
         </aside>
 
         <div class="content-wrapper">
             <section class="content-header">
                 <h1><br/></h1>
                 <ol class="breadcrumb">
-                    <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
-                    <li class="active">View Issues</li>
+                    <li><a href="/dashboard/"><i class="fa fa-building"></i> {{ tracker.company.name }}</a></li>
+                    <li class="active">{{ tracker.name }}</li>
                 </ol>
             </section>
 

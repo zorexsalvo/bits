@@ -21,6 +21,15 @@ class Company(models.Model):
     class Meta:
         verbose_name_plural = 'Companies'
 
+class Tracker(models.Model):
+    name = models.CharField(max_length=200)
+    company = models.ForeignKey(Company, related_name='trackers')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ('name', 'company')
 
 class User(models.Model):
     SEX = (('MALE', 'Male'),
@@ -70,12 +79,13 @@ class Notification(models.Model):
 class Issue(models.Model):
     PRIORITY = (('LOW', 'Low'),
                 ('NORMAL', 'Normal'),
-                ('HIGH', 'High'),
-                ('EMERGENCY', 'Emergency'))
+                ('HIGH', 'High'))
     REMARKS = (('OPEN', 'Open'),
-               ('RESOLVED', 'Resolved'),
-               ('CLOSED', 'Closed'))
+               ('CLOSED', 'Closed'),
+               ('SLEEP', 'Sleep'),
+               ('DEAD', 'Dead'))
 
+    tracker = models.ForeignKey(Tracker)
     reference_id = models.CharField(max_length=200, unique=True, blank=True)
     title = models.CharField(max_length=200)
     assigned_to = models.ForeignKey(User, related_name='issues')
@@ -141,14 +151,6 @@ class Thread(models.Model):
                                                     title=title,
                                                     url=url,
                                                     read=False)
-
-
-class Tracker(models.Model):
-    name = models.CharField(max_length=200)
-    company = models.ForeignKey(Company, related_name='trackers')
-
-    def __unicode__(self):
-        return self.name
 
 
 class SmsNotification(models.Model):

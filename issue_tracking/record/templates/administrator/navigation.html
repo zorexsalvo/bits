@@ -56,7 +56,7 @@
                             </a>
                             <ul class="treeview-menu">
                                 {% for tracker in company.trackers.all %}
-                                <li><a href="#">{{ tracker }}</a></li>
+                                <li><a href="trackers/{{ tracker.id }}/issues/"><i class="fa fa-exclamation"></i>{{ tracker }}</a></li>
                                 {% empty %}
                                 <li><a href="#">No trackers found.</a></li>
                                 {% endfor %}
