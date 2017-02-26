@@ -256,6 +256,7 @@ class AdminIssueView(AdministratorView):
         context['issues'] = self.get_issue(tracker_id)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
+        context['active_tracker'] = tracker_id
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):

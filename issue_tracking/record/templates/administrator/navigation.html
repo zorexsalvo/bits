@@ -38,7 +38,7 @@
             <ul class="treeview-menu">
                 {% if companies %}
                 {% for company in companies %}
-                <li class="treeview">
+                <li class="treeview {% if company.id == tracker.company.id %}active{% endif %}">
                     <a href="#">
                         <i class="fa fa-building"></i> <span>{{ company }}</span>
                         <span class="pull-right-container">
@@ -47,7 +47,7 @@
                     </a>
                     <ul class="treeview-menu">
                         <li class="#"><a href="/companies/{{ company.id }}/trackers/create/"><i class="fa fa-plus-square"></i> Create Tracker</a></li>
-                        <li class="treeview">
+                        <li class="treeview {% if active_tracker %}active{% endif %}">
                             <a href="#">
                                 <i class="fa fa-wifi"></i> <span>Open Trackers</span>
                                 <span class="pull-right-container">
@@ -56,7 +56,7 @@
                             </a>
                             <ul class="treeview-menu">
                                 {% for tracker in company.trackers.all %}
-                                <li><a href="trackers/{{ tracker.id }}/issues/"><i class="fa fa-exclamation"></i>{{ tracker }}</a></li>
+                                <li class="{% if tracker.id == active_tracker.id %}active{% endif %}"><a href="trackers/{{ tracker.id }}/issues/"><i class="fa fa-map-marker"></i>{{ tracker }}</a></li>
                                 {% empty %}
                                 <li><a href="#">No trackers found.</a></li>
                                 {% endfor %}
