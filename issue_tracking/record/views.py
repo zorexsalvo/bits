@@ -55,9 +55,15 @@ class UsernameLoginView(TemplateView):
         return url
 
     def get(self, request, *args, **kwargs):
+        redirect_map = {
+            'EMPLOYEE': 'dashboard',
+            'ADMINISTRATOR': 'create_company'
+        }
+
         form = self.form_class()
         if request.user.is_authenticated():
-            url = reverse('dashboard')
+            user = User.object.get(username=request.user)
+            url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
 
@@ -80,16 +86,27 @@ class LoginView(TemplateView):
 
         form = self.form_class({'username': request.GET.get('username')})
 
+        redirect_map = {
+            'EMPLOYEE': 'dashboard',
+            'ADMINISTRATOR': 'create_company'
+        }
+
         if request.user.is_authenticated():
-            url = reverse('dashboard')
+            user = User.object.get(username=request.user)
+            url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form, 'user': user})
 
     def post(self, request, *args, **kwargs):
+        redirect_map = {
+            'EMPLOYEE': 'dashboard',
+            'ADMINISTRATOR': 'create_company'
+        }
+
         user = User.objects.filter(username__username=request.GET.get('username')).first()
 
         form = self.form_class(request.POST)
-        url = reverse('dashboard')
+        url = reverse(redirect_map[user.type])
         if form.is_valid():
             user = form.login(request)
             _login = login(request, user)
