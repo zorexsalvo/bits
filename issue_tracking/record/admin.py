@@ -3,9 +3,9 @@ from .models import *
 
 class IssueAdmin(admin.ModelAdmin):
     search_fields = ('reference_id', 'title',)
-    list_filter = ('priority', 'remark',)
+    list_filter = ('priority', 'decision',)
     list_display = ('reference_id', 'title', 'assigned_to',
-                    'priority', 'remark', 'created_by',)
+                    'priority', 'decision', 'created_by',)
 
 
 class NotificationAdmin(admin.ModelAdmin):

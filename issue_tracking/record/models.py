@@ -90,7 +90,7 @@ class Issue(models.Model):
     title = models.CharField(max_length=200)
     assigned_to = models.ForeignKey(User, related_name='issues')
     priority = models.CharField(max_length=200, choices=PRIORITY, default='NORMAL')
-    remark = models.CharField(max_length=200, choices=REMARKS, default='OPEN')
+    decision = models.CharField(max_length=200, choices=REMARKS, default='OPEN')
     description = models.TextField()
 
     date_created = models.DateTimeField(auto_now_add=True)

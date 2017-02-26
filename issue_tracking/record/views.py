@@ -259,16 +259,17 @@ class AdminIssueView(AdministratorView):
         context['active_tracker'] = tracker_id
         return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, tracker_id, *args, **kwargs):
         form = self.form_class(request.POST or None)
         context = self.get_context(request)
-        context['issues'] = self.get_issue(context['user'])
+        context['issues'] = self.get_issue(tracker_id)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
 
         if form.is_valid():
-            url = reverse('issue')
+            url = reverse('admin_tracker_issue', kwargs={'tracker_id':tracker_id})
             data = form.cleaned_data
+            data['tracker'] = Tracker.objects.get(id=tracker_id)
             data['created_by'] = User.objects.get(username=request.user)
             issue = Issue.objects.create(**data)
             self.send_sms_notification(issue)
