@@ -323,7 +323,7 @@ class IssueView(UserView):
 
     def get_issue(self, user):
         if user:
-            return Issue.objects.filter(created_by__company__id=user.company.id).order_by('id')
+            return Issue.objects.filter(created_by__company__id=user.company.id).order_by('-id')
         return Issue.objects.all()
 
     def send_sms_notification(self, issue):
