@@ -51,14 +51,7 @@
                                             <th>Assigned To</th>
                                             <th>Date</th>
                                         </tr>
-                                        {% if issues %} {% for issue in issues %}
-                                        {% if issue.assigned_to.username.username == 'zorexsalvo' %}
-                                            <tr class="bg-teal">
-                                        {% elif issue.assigned_to.username.username == 'admin' %}
-                                            <tr class="bg-yellow">
-                                        {% else %}
-                                            <tr>
-                                        {% endif %}
+                                        {% for issue in issues %}
                                             <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.reference_id }}</a></td>
                                             <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.title }}</a></td>
                                             <td>{{ issue.created_by }}</td>
@@ -78,7 +71,11 @@
                                             <td>{{ issue.assigned_to }}</td>
                                             <td>{{ issue.date_created|date:"m-d-Y P" }}</td>
                                         </tr>
-                                        {% endfor %} {% endif %}
+                                        {% empty %}
+                                        <tr>
+                                            <td>No issues found.</td>
+                                        </tr>
+                                        {% endfor %}
                                     </table>
                                 </div>
                             </div>
