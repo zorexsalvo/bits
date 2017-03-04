@@ -41,6 +41,10 @@ def notification_view(request, notification_id):
     return HttpResponseRedirect(url)
 
 
+def http_403_permission_denied(request):
+    return render(request, 'error/403.html')
+
+
 class UsernameLoginView(TemplateView):
     form_class = UsernameForm
     template_name = 'security/user_login.html'
@@ -62,7 +66,7 @@ class UsernameLoginView(TemplateView):
 
         form = self.form_class()
         if request.user.is_authenticated():
-            user = User.object.get(username=request.user)
+            user = User.objects.get(username=request.user)
             url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
@@ -91,8 +95,12 @@ class LoginView(TemplateView):
             'ADMINISTRATOR': 'create_company'
         }
 
+        if user is None:
+            url = reverse('username_login')
+            return HttpResponseRedirect(url)
+
         if request.user.is_authenticated():
-            user = User.object.get(username=request.user)
+            user = User.objects.get(username=request.user)
             url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form, 'user': user})
@@ -103,7 +111,12 @@ class LoginView(TemplateView):
             'ADMINISTRATOR': 'create_company'
         }
 
-        user = User.objects.filter(username__username=request.GET.get('username')).first()
+        username = request.GET.get('username')
+        user = User.objects.filter(username__username=username).first()
+
+        if user is None:
+            url = reverse('username_login')
+            return HttpResponseRedirect(url)
 
         form = self.form_class(request.POST)
         url = reverse(redirect_map[user.type])
