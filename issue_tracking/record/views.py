@@ -264,6 +264,7 @@ class CreateTracker(AdministratorView):
 class AdminIssueView(AdministratorView):
     template_name = 'administrator/issue.html'
     form_class = IssueForm
+    respond_form_class = RespondForm
 
     def build_thread_array(self, count):
         thread = []
@@ -323,11 +324,13 @@ class AdminIssueView(AdministratorView):
 
     def get(self, request, tracker_id, *args, **kwargs):
         form = self.form_class()
+        respond_form = self.respond_form_class()
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
         context['issue_directory'] = self.get_issue_directory(tracker_id)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
+        context['respond_form'] = respond_form
         context['active_tracker'] = tracker_id
         return render(request, self.template_name, context)
 

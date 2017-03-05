@@ -107,6 +107,13 @@ class IssueForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'})
         }
 
+class RespondForm(forms.Form):
+    issue_id = forms.HiddenInput()
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title'}))
+    description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description'}))
+    assigned_to = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'assignedTo'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
+
 
 class ThreadForm(forms.ModelForm):
     class Meta:
