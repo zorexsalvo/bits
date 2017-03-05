@@ -44,32 +44,16 @@
                                 <div class="box-body table-responsive table-bordered no-padding">
                                     <table class="table table-hover">
                                         <tr>
-                                            <th>Reference ID</th>
-                                            <th>Title</th>
-                                            <th>From</th>
-                                            <th>Priority</th>
-                                            <th>Assigned To</th>
-                                            <th>Date</th>
+                                            <th>Timestamp</th>
+                                            {% for issue in issues %}
+                                            <th>{{ issue.title }}</th>
+                                            {% endfor %}
                                         </tr>
-                                        {% for issue in issues %}
-                                            <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.reference_id }}</a></td>
-                                            <td><a href="/issue/{{ issue.id }}/thread/">{{ issue.title }}</a></td>
-                                            <td>{{ issue.created_by }}</td>
-                                            <td>
-                                                {% if issue.priority == 'LOW' %}
-                                                    <span class="badge">
-                                                {% elif issue.priority == 'NORMAL' %}
-                                                    <span class="badge bg-green">
-                                                {% elif issue.priority == 'HIGH' %}
-                                                    <span class="badge bg-yellow">
-                                                {% else %}
-                                                    <span class="badge bg-red">
-                                                {% endif %}
-                                                    {{ issue.priority }}
-                                                </span>
-                                            </td>
-                                            <td>{{ issue.assigned_to }}</td>
-                                            <td>{{ issue.date_created|date:"m-d-Y P" }}</td>
+                                        {% for issue, comments in issue_directory.items %}
+                                            <td>{{ issue }}</td>
+                                            {% for comment in comments %}
+                                            <td>{{ comment }}</td>
+                                            {% endfor %}
                                         </tr>
                                         {% empty %}
                                         <tr>

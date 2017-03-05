@@ -16,6 +16,7 @@ from issue_tracker.config import sys_config
 from issue_tracker.roles import Administrator, Employee
 from rolepermissions.mixins import HasRoleMixin
 
+from collections import OrderedDict
 
 import json
 import requests
@@ -264,6 +265,38 @@ class AdminIssueView(AdministratorView):
     template_name = 'administrator/issue.html'
     form_class = IssueForm
 
+    def build_thread_array(self, count):
+        thread = []
+        for x in range(count):
+            thread.append("")
+        return thread
+
+    def get_issue_directory(self, tracker_id):
+        issues_directory = OrderedDict()
+        issues = Issue.objects.filter(tracker__id=tracker_id)
+
+        counter = 0
+        for issue in issues:
+            timestamp = issue.date_created.strftime("%m-%d-%Y %H:%M:%S")
+            if timestamp not in issues_directory:
+                thread = self.build_thread_array(issues.count())
+                thread[counter] = issue.description
+                issues_directory[timestamp] = thread
+            else:
+                issues_directory[timestamp][counter] = issue.description
+
+            for note in issue.threads.all():
+                timestamp = note.date_created.strftime("%m-%d-%Y %H:%M:%S")
+                if timestamp not in issues_directory:
+                    thread = self.build_thread_array(issues.count())
+                    thread[counter] = note.note
+                    issues_directory[timestamp] = thread
+                else:
+                    issues_directory[timestamp][counter] = note.note
+            counter += 1
+
+        return issues_directory
+
     def get_issue(self, tracker_id):
         return Issue.objects.filter(tracker__id=tracker_id)
 
@@ -292,6 +325,7 @@ class AdminIssueView(AdministratorView):
         form = self.form_class()
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
+        context['issue_directory'] = self.get_issue_directory(tracker_id)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
         context['active_tracker'] = tracker_id
