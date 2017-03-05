@@ -324,7 +324,7 @@ class AdminIssueView(AdministratorView):
 
     def get(self, request, tracker_id, *args, **kwargs):
         form = self.form_class()
-        respond_form = self.respond_form_class()
+        respond_form = self.respond_form_class(tracker_id)
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
         context['issue_directory'] = self.get_issue_directory(tracker_id)

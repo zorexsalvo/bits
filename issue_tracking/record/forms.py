@@ -111,8 +111,14 @@ class RespondForm(forms.Form):
     issue_id = forms.HiddenInput()
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title'}))
     description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description'}))
-    assigned_to = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'assignedTo'}))
+    assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
     message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
+
+    def __init__(self, tracker_id, *args, **kwargs):
+        company = Tracker.objects.get(id=tracker_id).company
+        choices = tuple([(x.id, str(x)) for x in User.objects.filter(company=company)])
+        super(RespondForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_to'].choices = choices
 
 
 class ThreadForm(forms.ModelForm):
