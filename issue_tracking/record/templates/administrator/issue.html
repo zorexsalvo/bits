@@ -47,7 +47,7 @@
                                             <tr>
                                                 <th>Timestamp</th>
                                                 {% for issue in issues %}
-                                                <th>{{ issue.title }}</th>
+                                                <th>Issue {{ issue.reference_id }}: {{ issue.title }} {{ issue.priority }}</th>
                                                 {% endfor %}
                                             </tr>
                                         </thead>
