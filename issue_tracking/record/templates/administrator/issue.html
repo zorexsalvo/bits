@@ -1,4 +1,4 @@
-{% extends 'user/base.html' %} {% load staticfiles %} {% block content %}
+{% extends 'administrator/base.html' %} {% load staticfiles %} {% block content %}
 
 <body class="hold-transition skin-purple sidebar-mini fixed">
     <div class="wrapper">
@@ -41,25 +41,30 @@
                                     </div>
                                 </div>
 
-                                <div class="box-body table-responsive table-bordered no-padding">
-                                    <table class="table table-hover">
-                                        <tr>
-                                            <th>Timestamp</th>
-                                            {% for issue in issues %}
-                                            <th>{{ issue.title }}</th>
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                {% for issue in issues %}
+                                                <th>{{ issue.title }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for issue, comments in issue_directory.items %}
+                                            <tr>
+                                                <td>{{ issue }}</td>
+                                                {% for comment in comments %}
+                                                <td>{{ comment }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td>No issues found.</td>
+                                            </tr>
                                             {% endfor %}
-                                        </tr>
-                                        {% for issue, comments in issue_directory.items %}
-                                            <td>{{ issue }}</td>
-                                            {% for comment in comments %}
-                                            <td>{{ comment }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                        {% empty %}
-                                        <tr>
-                                            <td>No issues found.</td>
-                                        </tr>
-                                        {% endfor %}
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -91,10 +96,6 @@
     </div>
 </div>
 
-
-
-
-
     </div>
 
     {% block footer %}
@@ -103,11 +104,6 @@
 
     {% block js %}
         {{ block.super }}
-        <script type="text/javascript">
-            $(function () {
-                $(".select2").select2();
-            });
-        </script>
     {% endblock js %}
 </body>
 {% endblock content %}
