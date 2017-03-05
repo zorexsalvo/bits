@@ -108,7 +108,7 @@ class IssueForm(forms.ModelForm):
         }
 
 class RespondForm(forms.Form):
-    issue_id = forms.HiddenInput()
+    issue_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control', 'id': 'issue_id'}))
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title'}))
     description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description'}))
     assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))

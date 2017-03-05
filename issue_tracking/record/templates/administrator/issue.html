@@ -125,16 +125,6 @@
 
     {% block js %}
         {{ block.super }}
-        <!--<script>
-        $(document).on("click", ".open-RespondDialog", function () {
-            var issueId = $(this).data('id');
-            var issueTitle = $(this).data('title');
-            var assignedTo = $(this).data('assign');
-            var issueDescription = $(this).data('description');
-
-            
-        });
-        </script>-->
         <script>
             $('table').on('click', '.open-RespondDialog', function (e) {
                 var header = e.delegateTarget.tHead.rows[0].cells[this.cellIndex];
@@ -144,7 +134,7 @@
                 var issueDescription = $(header).data('description');
 
                 $(".modal-body #title").val(issueTitle);
-                $(".modal-body #id").val(issueId);
+                $(".modal-body #issue_id").val(issueId);
                 $(".modal-body #description").val(issueDescription);
             });
         </script>
