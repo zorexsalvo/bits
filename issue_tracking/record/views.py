@@ -45,6 +45,14 @@ def http_403_permission_denied(request):
     return render(request, 'error/403.html')
 
 
+def http_404_not_found(request):
+    return render(request, 'error/404.html')
+
+
+def http_500_server_error(request):
+    return render(request, 'error/500.html')
+
+
 class UsernameLoginView(TemplateView):
     form_class = UsernameForm
     template_name = 'security/user_login.html'
