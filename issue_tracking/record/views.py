@@ -273,7 +273,7 @@ class AdminIssueView(AdministratorView):
         return thread
 
     def get_issue_directory(self, tracker_id):
-        issues_directory = OrderedDict()
+        issues_directory = {}
         issues = Issue.objects.filter(tracker__id=tracker_id)
 
         counter = 0
@@ -296,7 +296,7 @@ class AdminIssueView(AdministratorView):
                     issues_directory[timestamp][counter] = note.note
             counter += 1
 
-        return issues_directory
+        return OrderedDict(sorted(issues_directory.items()))
 
     def get_issue(self, tracker_id):
         return Issue.objects.filter(tracker__id=tracker_id)
