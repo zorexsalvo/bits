@@ -379,23 +379,24 @@ class UpdateEmployee(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, employee_id, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
+        form = self.form_class(request.POST or None, request.FILES or None)
         context = self.get_context(request)
         context['request'] = 'POST'
 
         if form.is_valid():
-            user = User.objects.filter(id=employee_id)
-            user.update(
-                first_name = form.cleaned_data.get('first_name'),
-                middle_name = form.cleaned_data.get('middle_name'),
-                last_name = form.cleaned_data.get('last_name'),
-                sex = form.cleaned_data.get('sex'),
-                date_of_birth = form.cleaned_data.get('date_of_birth'),
-                mobile_number = form.cleaned_data.get('mobile_number'),
-                company = form.cleaned_data.get('company'),
-                position = form.cleaned_data.get('position'),
-                picture = '/images/' + str(form.cleaned_data.get('picture'))
-            )
+            user = User.objects.get(id=employee_id)
+            print(type(form.cleaned_data['picture']))
+
+            user.first_name = form.cleaned_data.get('first_name')
+            user.middle_name = form.cleaned_data.get('middle_name')
+            user.last_name = form.cleaned_data.get('last_name')
+            user.sex = form.cleaned_data.get('sex')
+            user.date_of_birth = form.cleaned_data.get('date_of_birth')
+            user.mobile_number = form.cleaned_data.get('mobile_number')
+            user.company = form.cleaned_data.get('company')
+            user.position = form.cleaned_data.get('position')
+            user.picture = form.cleaned_data.get('picture')
+            user.save()
             context['form'] = form
             return render(request, self.template_name, context)
 
