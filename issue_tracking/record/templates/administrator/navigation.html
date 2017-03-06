@@ -78,6 +78,20 @@
         <li class="header">EMPLOYEE</li>
         <li class="{% if active_tab == 'create_employee' %}active{% endif %}"><a href="/employees/create/"><i class="fa fa-edit"></i> <span>Create Employee</span></a></li>
 
-        <li class="{% if active_tab == 'employee' %}active{% endif %}"><a href="/employees/"><i class="fa fa-table"></i> <span>View Employees</span></a></li>
+        <li class="treeview {% if active_tab == 'employee' %}active{% endif %}">
+            <a href="#">
+                <i class="fa fa-table"></i> <span>View Employees</span>
+                <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                {% for company in companies %}
+                <li class="{% if company.id == active_company_employee.id %}active{% endif %}"><a href="/companies/{{ company.id }}/employees/"><i class="fa fa-building"></i>{{ company }}</a></li>
+                {% empty %}
+                <li><a href="#">No company found.</a></li>
+                {% endfor %}
+            </ul>
+        </li>
     </ul>
 </section>

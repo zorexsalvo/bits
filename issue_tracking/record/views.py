@@ -190,12 +190,13 @@ class CreateCompany(AdministratorView):
 class ViewEmployee(AdministratorView):
     template_name = 'administrator/view_employee.html'
 
-    def get_employees(self):
-        return User.objects.all()
+    def get_employees(self, company_id):
+        return User.objects.filter(company__id=company_id)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, company_id, *args, **kwargs):
         context = self.get_context(request)
-        context['employees'] = self.get_employees()
+        context['company'] = Company.objects.get(id=company_id)
+        context['employees'] = self.get_employees(company_id)
         return render(request, self.template_name, context)
 
 

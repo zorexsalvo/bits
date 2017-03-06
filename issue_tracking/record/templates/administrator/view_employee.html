@@ -10,7 +10,7 @@
             </header>
 
             <aside class="main-sidebar">
-                {% include 'administrator/navigation.html' with active_tab='employee' %}
+                {% include 'administrator/navigation.html' with active_tab='employee' active_company_employee=company %}
             </aside>
 
             <div class="content-wrapper">
@@ -50,7 +50,7 @@
                                             <th>Position</th>
                                             <th>Action</th>
                                         </tr>
-                                        {% if employees %} {% for employee in employees %}
+                                        {% for employee in employees %}
                                         <tr>
                                             <td>{{ employee.id }}</td>
                                             <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
@@ -66,7 +66,9 @@
                                                 </a>
                                             </td>
                                         </tr>
-                                        {% endfor %} {% endif %}
+                                        {% empty %}
+                                        <tr><td>No employees found.</td></tr>
+                                        {% endfor %}
                                     </table>
                                 </div>
                             </div>
