@@ -92,8 +92,14 @@ class UpdateUserForm(forms.ModelForm):
             'position': forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'})
         }
 
-class TrackerForm(forms.Form):
-    tracker = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Tracker', 'class': 'form-control'}))
+class TrackerForm(forms.ModelForm):
+    class Meta:
+        model = Tracker
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Tracker Name', 'class': 'form-control'}),
+            'company': forms.HiddenInput()
+        }
 
 
 class IssueForm(forms.ModelForm):

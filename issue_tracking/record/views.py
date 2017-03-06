@@ -213,9 +213,12 @@ class CreateEmployee(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        short_code = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        cross_telco = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'cross_telco')
+        url = reverse('create_employee')
         context = self.get_context(request)
         form = self.form_class(request.POST or None, request.FILES or None)
-        context['request'] = 'POST'
+        context['form'] = form
 
         if form.is_valid():
             auth_user = self._save_user(form.cleaned_data.get('username'), form.cleaned_data.get('password'))
@@ -233,9 +236,11 @@ class CreateEmployee(AdministratorView):
             user.created_by = request.user
             user.picture = form.cleaned_data.get('picture')
             user.save()
-            context['form'] = self.form_class()
-            return render(request, self.template_name, context)
-        context['form'] = self.form_class()
+            messages.success(request, 'Text INFO to {} (Cross-telco: {}) to subscribe to SMS Notification.'.format(short_code, cross_telco))
+            return HttpResponseRedirect(url)
+        else:
+            messages.warning(request, 'User already exists.')
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
 
@@ -245,23 +250,26 @@ class CreateTracker(AdministratorView):
 
     def get(self, request, company_id, *args, **kwargs):
         context = self.get_context(request)
-        context['form'] = self.form_class()
+        context['form'] = self.form_class(initial={'company': company_id})
         context['company'] = Company.objects.get(id=company_id)
         return render(request, self.template_name, context)
 
     def post(self, request, company_id, *args, **kwargs):
+        url = reverse('create_tracker', kwargs={'company_id': company_id})
         context = self.get_context(request)
-        form = self.form_class(request.POST or None)
-        context['request'] = 'POST'
-        context['company'] = Company.objects.get(id=company_id)
+        company = Company.objects.get(id=company_id)
+        form = self.form_class(request.POST or None, initial={'company': company.id})
+        context['form'] = form
+        context['company'] = company
 
         if form.is_valid():
-            tracker = Tracker.objects.create(name=form.cleaned_data.get('tracker'),
-                                             company=Company.objects.get(id=company_id))
-            context['form'] = self.form_class()
-            return render(request, self.template_name, context)
+            form.save()
+            messages.success(request, 'Tracker has been created successfully!')
+            return HttpResponseRedirect(url)
+        else:
+            messages.warning(request, 'Tracker already exists.')
+            return HttpResponseRedirect(url)
 
-        context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
 
