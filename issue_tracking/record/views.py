@@ -8,6 +8,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.contrib import messages
 
 from .forms import *
 from .models import Company, User, Tracker, SmsNotification
@@ -168,16 +169,19 @@ class CreateCompany(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        url = reverse('create_company')
         context = self.get_context(request)
         form = self.form_class(request.POST or None)
-        context['request'] = 'POST'
 
         if form.is_valid():
             name = form.cleaned_data.get('name')
             company = Company(name=name)
             company.save()
-            context['form'] = self.form_class()
-            return render(request, self.template_name, context)
+            messages.success(request, 'Company has created successfully!')
+            return HttpResponseRedirect(url)
+        else:
+            messages.warning(request, 'Company already exists.')
+            return HttpResponseRedirect(url)
 
         context['form'] = self.form_class()
         return render(request, self.template_name, context)
