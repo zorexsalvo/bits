@@ -391,14 +391,14 @@ class UpdateEmployee(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, employee_id, *args, **kwargs):
-        form = self.form_class(request.POST or None, request.FILES or None)
+        url = reverse('update_employee', kwargs={'employee_id': employee_id})
+        user = User.objects.get(id=employee_id)
+        form = self.form_class(request.POST or None, request.FILES or None, instance=user)
         context = self.get_context(request)
-        context['request'] = 'POST'
+        context['form'] = form
 
         if form.is_valid():
             user = User.objects.get(id=employee_id)
-            print(type(form.cleaned_data['picture']))
-
             user.first_name = form.cleaned_data.get('first_name')
             user.middle_name = form.cleaned_data.get('middle_name')
             user.last_name = form.cleaned_data.get('last_name')
@@ -409,10 +409,13 @@ class UpdateEmployee(AdministratorView):
             user.position = form.cleaned_data.get('position')
             user.picture = form.cleaned_data.get('picture')
             user.save()
-            context['form'] = form
-            return render(request, self.template_name, context)
+            messages.success(request, 'Employee has been updated successfully.')
+            return HttpResponseRedirect(url)
+        else:
+            print(form.errors)
+            messages.warning(request, 'Update is not successful.')
+            return HttpResponseRedirect(url)
 
-        context['form'] = form
         return render(request, self.template_name, context)
 
 
