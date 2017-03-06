@@ -71,7 +71,7 @@ class UsernameLoginView(TemplateView):
     def get(self, request, *args, **kwargs):
         redirect_map = {
             'EMPLOYEE': 'dashboard',
-            'ADMINISTRATOR': 'create_company'
+            'ADMINISTRATOR': 'admin_dashboard'
         }
 
         form = self.form_class()
@@ -102,7 +102,7 @@ class LoginView(TemplateView):
 
         redirect_map = {
             'EMPLOYEE': 'dashboard',
-            'ADMINISTRATOR': 'create_company'
+            'ADMINISTRATOR': 'admin_dashboard'
         }
 
         if user is None:
@@ -118,7 +118,7 @@ class LoginView(TemplateView):
     def post(self, request, *args, **kwargs):
         redirect_map = {
             'EMPLOYEE': 'dashboard',
-            'ADMINISTRATOR': 'create_company'
+            'ADMINISTRATOR': 'admin_dashboard'
         }
 
         username = request.GET.get('username')
@@ -462,6 +462,34 @@ class AdminThreadView(AdministratorView):
         context['form'] = self.form_class()
         return render(request, self.template_name, context)
 
+
+class AdminDashboard(AdministratorView):
+    template_name = 'administrator/dashboard.html'
+
+    def build_statistics(self):
+        statistics = OrderedDict()
+        open = Issue.objects.filter(decision='OPEN').count()
+        sleep = Issue.objects.filter(decision='SLEEP').count()
+        closed = Issue.objects.filter(decision='CLOSED').count()
+        dead = Issue.objects.filter(decision='DEAD').count()
+        low = Issue.objects.filter(priority='LOW').count()
+        normal = Issue.objects.filter(priority='NORMAL').count()
+        high = Issue.objects.filter(priority='HIGH').count()
+
+        statistics['open'] = open
+        statistics['sleep'] = sleep
+        statistics['closed'] = closed
+        statistics['dead'] = dead
+        statistics['low'] = low
+        statistics['normal'] = normal
+        statistics['high'] = high
+
+        return statistics
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        context['statistics'] = self.build_statistics()
+        return render(request, self.template_name, context)
 
 class EmployeeView(HasRoleMixin, TemplateView):
     allowed_roles = [Employee,]

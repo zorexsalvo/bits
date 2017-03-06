@@ -93,5 +93,9 @@
                 {% endfor %}
             </ul>
         </li>
+
+        <li class="header"></li>
+        <li class="{% if active_tab == 'dashboard' %}active{% endif %}"><a href="/dashboard/admin/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+
     </ul>
 </section>
