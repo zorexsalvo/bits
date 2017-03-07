@@ -2,6 +2,7 @@ from datetime import date
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User as AuthUser
+from django.db.models import Q
 from .models import *
 
 
@@ -121,7 +122,7 @@ class AssignForm(forms.Form):
                     ('NORMAL', 'Normal'),
                     ('HIGH', 'High'))
         company = Tracker.objects.get(id=tracker_id).company
-        choices = tuple([(x.id, str(x)) for x in User.objects.filter(company=company)])
+        choices = tuple([(x.id, str(x)) for x in User.objects.filter(Q(company=company) | Q(type='ADMINISTRATOR'))])
         super(AssignForm, self).__init__(*args, **kwargs)
         self.fields['assigned_to'].choices = choices
         self.fields['priority'].choices = priority
@@ -140,7 +141,7 @@ class RespondForm(forms.Form):
                     ('SLEEP', 'Sleep'),
                     ('DEAD', 'Dead'))
         company = Tracker.objects.get(id=tracker_id).company
-        choices = tuple([(x.id, str(x)) for x in User.objects.filter(company=company)])
+        choices = tuple([(x.id, str(x)) for x in User.objects.filter(Q(company=company) | Q(type='ADMINISTRATOR'))])
         super(RespondForm, self).__init__(*args, **kwargs)
         self.fields['assigned_to'].choices = choices
         self.fields['decision'].choices = decision
@@ -156,4 +157,4 @@ class ThreadForm(forms.ModelForm):
 
 
 class CheckForm(forms.Form):
-    keyword = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Please input the Refence ID of the issue you want to check.', 'class': 'form-control'}))
+    keyword = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Please input the Reference ID of the issue you want to check.', 'class': 'form-control'}))
