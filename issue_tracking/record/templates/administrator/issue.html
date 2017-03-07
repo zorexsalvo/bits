@@ -45,13 +45,18 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
+                                                {% if issues %}
                                                 <th>Timestamp</th>
+                                                {% endif %}
                                                 {% for issue in issues %}
                                                 <th class="open-RespondDialog" data-toggle="modal" data-target="#responseModal" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
+                                                {% empty %}
+                                                <th>No issue found.</th>
                                                 {% endfor %}
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {% if issues %}
                                             {% for issue, comments in issue_directory.items %}
                                             <tr>
                                                 <td>{{ issue }}</td>
@@ -61,9 +66,10 @@
                                             </tr>
                                             {% empty %}
                                             <tr>
-                                                <td>No issues found.</td>
+                                                <td>No response found.</td>
                                             </tr>
                                             {% endfor %}
+                                            {% endif %}
                                         </tbody>
                                     </table>
                                 </div>

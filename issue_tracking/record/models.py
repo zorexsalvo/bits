@@ -87,7 +87,7 @@ class Issue(models.Model):
                ('DEAD', 'Dead'))
 
     tracker = models.ForeignKey(Tracker)
-    reference_id = models.CharField(max_length=200, unique=True, blank=True)
+    reference_id = models.CharField(max_length=200, blank=True)
     title = models.CharField(max_length=200)
     assigned_to = models.ForeignKey(User, related_name='issues', null=True)
     priority = models.CharField(max_length=200, choices=PRIORITY, default=None, null=True)
@@ -102,7 +102,8 @@ class Issue(models.Model):
 
     def save(self, *args, **kwargs):
         super(Issue, self).save(*args, **kwargs)
-        Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
+        count = Issue.objects.filter(tracker__id=self.tracker.id).count()
+        Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
 
         if self.assigned_to:
             url = '/issue/{}/thread/'.format(self.id)
