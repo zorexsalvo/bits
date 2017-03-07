@@ -49,7 +49,26 @@
                                                 <th>Timestamp</th>
                                                 {% endif %}
                                                 {% for issue in issues %}
-                                                <th class="open-RespondDialog" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
+                                                <th class="open-RespondDialog"
+                                                    data-id="{{ issue.id }}"
+                                                    data-title="{{ issue }}"
+                                                    data-assign="{{ issue.assigned_to }}"
+                                                    data-description="{{ issue.description }}">
+                                                    Issue {{ issue.reference_id }}: {{ issue.title }} 
+                                                    {% if issue.priority %}
+                                                        {% if issue.priority == 'LOW' %}
+                                                            <span class="badge">
+                                                        {% elif issue.priority == 'NORMAL' %}
+                                                            <span class="badge bg-green">
+                                                        {% elif issue.priority == 'HIGH' %}
+                                                            <span class="badge bg-yellow">
+                                                        {% else %}
+                                                            <span class="badge bg-red">
+                                                        {% endif %}
+                                                            {{ issue.priority }}
+                                                        </span>
+                                                    {% endif %}
+                                                </th>
                                                 {% empty %}
                                                 <th>No issue found.</th>
                                                 {% endfor %}
