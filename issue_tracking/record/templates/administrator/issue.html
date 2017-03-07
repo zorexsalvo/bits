@@ -49,7 +49,7 @@
                                                 <th>Timestamp</th>
                                                 {% endif %}
                                                 {% for issue in issues %}
-                                                <th class="open-RespondDialog" data-toggle="modal" data-target="{% if issue.assigned_to %}#responseModal{% else %}#assignModal{% endif %}" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
+                                                <th class="open-RespondDialog" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
                                                 {% empty %}
                                                 <th>No issue found.</th>
                                                 {% endfor %}
@@ -61,7 +61,7 @@
                                             <tr>
                                                 <td>{{ issue }}</td>
                                                 {% for comment in comments %}
-                                                <td class="open-RespondDialog" data-toggle="modal" data-target="#responseModal">{{ comment }}</td>
+                                                <td class="open-RespondDialog">{{ comment }}</td>
                                                 {% endfor %}
                                             </tr>
                                             {% empty %}
@@ -163,6 +163,13 @@
                 $(".modal-body #title").val(issueTitle);
                 $(".modal-body #issue_id").val(issueId);
                 $(".modal-body #description").val(issueDescription);
+
+                if (issueDescription == 'None') {
+                    $('#assignModal').modal('show');
+                }
+                else {
+                    $('#responseModal').modal('show');
+                }
             });
         </script>
     {% endblock js %}

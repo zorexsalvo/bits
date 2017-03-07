@@ -103,7 +103,8 @@ class Issue(models.Model):
     def save(self, *args, **kwargs):
         super(Issue, self).save(*args, **kwargs)
         count = Issue.objects.filter(tracker__id=self.tracker.id).count()
-        Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
+        if not self.reference_id:
+            Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
 
         if self.assigned_to:
             url = '/issue/{}/thread/'.format(self.id)
