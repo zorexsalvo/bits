@@ -128,16 +128,22 @@ class AssignForm(forms.Form):
 
 class RespondForm(forms.Form):
     issue_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control', 'id': 'issue_id'}))
-    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title'}))
-    description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description'}))
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title', 'readonly': ''}))
+    description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description', 'readonly': ''}))
     assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+    decision = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
     message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
 
     def __init__(self, tracker_id, *args, **kwargs):
+        decision = (('OPEN', 'Open'),
+                    ('CLOSED', 'Closed'),
+                    ('SLEEP', 'Sleep'),
+                    ('DEAD', 'Dead'))
         company = Tracker.objects.get(id=tracker_id).company
         choices = tuple([(x.id, str(x)) for x in User.objects.filter(company=company)])
         super(RespondForm, self).__init__(*args, **kwargs)
         self.fields['assigned_to'].choices = choices
+        self.fields['decision'].choices = decision
 
 
 class ThreadForm(forms.ModelForm):
