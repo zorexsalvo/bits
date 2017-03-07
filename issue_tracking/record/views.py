@@ -293,7 +293,7 @@ class AdminIssueView(AdministratorView):
 
         counter = 0
         for issue in issues:
-            timestamp = issue.date_created.strftime("%m-%d-%Y %H:%M:%S")
+            timestamp = timezone.localtime(issue.date_created).strftime("%m-%d-%Y %H:%M:%S")
             if timestamp not in issues_directory:
                 thread = self.build_thread_array(issues.count())
                 if issue.description:
@@ -304,7 +304,7 @@ class AdminIssueView(AdministratorView):
                     issues_directory[timestamp][counter] = issue.description
 
             for note in issue.threads.all():
-                timestamp = note.date_created.strftime("%m-%d-%Y %H:%M:%S")
+                timestamp = timezone.localtime(note.date_created).strftime("%m-%d-%Y %H:%M:%S")
                 if timestamp not in issues_directory:
                     thread = self.build_thread_array(issues.count())
                     thread[counter] = note.note
