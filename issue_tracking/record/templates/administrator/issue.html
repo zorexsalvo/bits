@@ -49,7 +49,7 @@
                                                 <th>Timestamp</th>
                                                 {% endif %}
                                                 {% for issue in issues %}
-                                                <th class="open-RespondDialog" data-toggle="modal" data-target="#responseModal" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
+                                                <th class="open-RespondDialog" data-toggle="modal" data-target="{% if issue.assigned_to %}#responseModal{% else %}#assignModal{% endif %}" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
                                                 {% empty %}
                                                 <th>No issue found.</th>
                                                 {% endfor %}
@@ -92,6 +92,27 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Issue Details</h4>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ assign_form.as_p }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

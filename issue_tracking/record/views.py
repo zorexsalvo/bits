@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.contrib import messages
+from django.utils import timezone
 
 from .forms import *
 from .models import Company, User, Tracker, SmsNotification
@@ -278,6 +279,7 @@ class AdminIssueView(AdministratorView):
     template_name = 'administrator/issue.html'
     form_class = IssueForm
     respond_form_class = RespondForm
+    assign_form_class = AssignForm
 
     def build_thread_array(self, count):
         thread = []
@@ -340,43 +342,56 @@ class AdminIssueView(AdministratorView):
     def get(self, request, tracker_id, *args, **kwargs):
         form = self.form_class()
         respond_form = self.respond_form_class(tracker_id)
+        assign_form = self.assign_form_class(tracker_id)
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
         context['issue_directory'] = self.get_issue_directory(tracker_id)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
         context['respond_form'] = respond_form
+        context['assign_form'] = assign_form
         context['active_tracker'] = tracker_id
         return render(request, self.template_name, context)
 
     def post(self, request, tracker_id, *args, **kwargs):
+        url = reverse('admin_tracker_issue', kwargs={'tracker_id':tracker_id})
         form = self.form_class(request.POST or None)
+        assign_form = self.assign_form_class(tracker_id, request.POST or None)
         respond_form = self.respond_form_class(tracker_id, request.POST or None)
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
         context['issue_directory'] = self.get_issue_directory(tracker_id)
         context['respond_form'] = respond_form
         context['active_tracker'] = tracker_id
+        context['assign_form'] = assign_form
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
 
-        if form.is_valid():
-            url = reverse('admin_tracker_issue', kwargs={'tracker_id':tracker_id})
+        if form.is_valid() and request.POST.get('issue_id') == None:
             data = form.cleaned_data
             data['tracker'] = Tracker.objects.get(id=tracker_id)
             data['created_by'] = User.objects.get(username=request.user)
             issue = Issue.objects.create(**data)
-            # self.send_sms_notification(issue)
             return HttpResponseRedirect(url)
 
         if respond_form.is_valid():
-            url = reverse('admin_tracker_issue', kwargs={'tracker_id':tracker_id})
             data = respond_form.cleaned_data
             issue = Issue.objects.get(id=data.get('issue_id'))
             thread = Thread(issue=issue,
                             note=data.get('message'),
                             created_by=User.objects.get(username=request.user))
             thread.save()
+            return HttpResponseRedirect(url)
+
+        if assign_form.is_valid():
+            data = assign_form.cleaned_data
+            user = User.objects.get(id=data.get('assigned_to'))
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            issue.priority = data.get('priority')
+            issue.assigned_to = user
+            issue.description = data.get('description')
+            issue.date_created = timezone.now()
+            issue.save()
             return HttpResponseRedirect(url)
 
         return render(request, self.template_name, context)

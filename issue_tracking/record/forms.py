@@ -109,6 +109,23 @@ class IssueForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'placeholder': 'Title', 'class': 'form-control'})
         }
 
+class AssignForm(forms.Form):
+    issue_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control', 'id': 'issue_id'}))
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title', 'readonly': ''}))
+    assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+    priority = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'id': 'priority'}))
+    description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
+
+    def __init__(self, tracker_id, *args, **kwargs):
+        priority = (('LOW', 'Low'),
+                    ('NORMAL', 'Normal'),
+                    ('HIGH', 'High'))
+        company = Tracker.objects.get(id=tracker_id).company
+        choices = tuple([(x.id, str(x)) for x in User.objects.filter(company=company)])
+        super(AssignForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_to'].choices = choices
+        self.fields['priority'].choices = priority
+
 class RespondForm(forms.Form):
     issue_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control', 'id': 'issue_id'}))
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title'}))
