@@ -104,12 +104,9 @@ class TrackerForm(forms.ModelForm):
 class IssueForm(forms.ModelForm):
     class Meta:
         model = Issue
-        exclude = ['reference_id', 'date_created', 'created_by', 'tracker', 'decision',]
+        fields = ('title',)
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Title', 'class': 'form-control'}),
-            'assigned_to': forms.Select(attrs={'class': 'form-control select2'}),
-            'priority': forms.Select(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control'})
+            'title': forms.TextInput(attrs={'placeholder': 'Title', 'class': 'form-control'})
         }
 
 class RespondForm(forms.Form):

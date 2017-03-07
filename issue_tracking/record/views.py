@@ -294,10 +294,12 @@ class AdminIssueView(AdministratorView):
             timestamp = issue.date_created.strftime("%m-%d-%Y %H:%M:%S")
             if timestamp not in issues_directory:
                 thread = self.build_thread_array(issues.count())
-                thread[counter] = issue.description
-                issues_directory[timestamp] = thread
+                if issue.description:
+                    thread[counter] = issue.description
+                    issues_directory[timestamp] = thread
             else:
-                issues_directory[timestamp][counter] = issue.description
+                if issue.description:
+                    issues_directory[timestamp][counter] = issue.description
 
             for note in issue.threads.all():
                 timestamp = note.date_created.strftime("%m-%d-%Y %H:%M:%S")
@@ -364,7 +366,7 @@ class AdminIssueView(AdministratorView):
             data['tracker'] = Tracker.objects.get(id=tracker_id)
             data['created_by'] = User.objects.get(username=request.user)
             issue = Issue.objects.create(**data)
-            self.send_sms_notification(issue)
+            # self.send_sms_notification(issue)
             return HttpResponseRedirect(url)
 
         if respond_form.is_valid():

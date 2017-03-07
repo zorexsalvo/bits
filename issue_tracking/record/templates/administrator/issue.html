@@ -47,7 +47,7 @@
                                             <tr>
                                                 <th>Timestamp</th>
                                                 {% for issue in issues %}
-                                                <th class="open-RespondDialog" data-toggle="modal" data-target="#responseModal" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {{ issue.priority }}</th>
+                                                <th class="open-RespondDialog" data-toggle="modal" data-target="#responseModal" data-id="{{ issue.id }}" data-title="{{ issue }}" data-assign="{{ issue.assigned_to }}" data-description="{{ issue.description }}">Issue {{ issue.reference_id }}: {{ issue.title }} {% if issue.priority %}{{ issue.priority }}{% endif %}</th>
                                                 {% endfor %}
                                             </tr>
                                         </thead>

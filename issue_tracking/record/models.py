@@ -77,7 +77,8 @@ class Notification(models.Model):
 
 
 class Issue(models.Model):
-    PRIORITY = (('LOW', 'Low'),
+    PRIORITY = ((None, ''),
+                ('LOW', 'Low'),
                 ('NORMAL', 'Normal'),
                 ('HIGH', 'High'))
     REMARKS = (('OPEN', 'Open'),
@@ -88,10 +89,10 @@ class Issue(models.Model):
     tracker = models.ForeignKey(Tracker)
     reference_id = models.CharField(max_length=200, unique=True, blank=True)
     title = models.CharField(max_length=200)
-    assigned_to = models.ForeignKey(User, related_name='issues')
-    priority = models.CharField(max_length=200, choices=PRIORITY, default='NORMAL')
+    assigned_to = models.ForeignKey(User, related_name='issues', null=True)
+    priority = models.CharField(max_length=200, choices=PRIORITY, default=None, null=True)
     decision = models.CharField(max_length=200, choices=REMARKS, default='OPEN')
-    description = models.TextField()
+    description = models.TextField(null=True)
 
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='issues_created')
@@ -103,14 +104,15 @@ class Issue(models.Model):
         super(Issue, self).save(*args, **kwargs)
         Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(self.id))
 
-        url = '/issue/{}/thread/'.format(self.id)
-        title = '{} assigned you in an issue.'.format(self.created_by)
+        if self.assigned_to:
+            url = '/issue/{}/thread/'.format(self.id)
+            title = '{} assigned you in an issue.'.format(self.created_by)
 
-        Notification.objects.create(user=self.assigned_to,
-                                    category='ISSUE',
-                                    title=title,
-                                    url=url,
-                                    read=False)
+            Notification.objects.create(user=self.assigned_to,
+                                        category='ISSUE',
+                                        title=title,
+                                        url=url,
+                                        read=False)
 
 
 class Thread(models.Model):
