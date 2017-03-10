@@ -52,7 +52,7 @@
                                         </tr>
                                         {% for employee in employees %}
                                         <tr>
-                                            <td>{{ employee.id }}</td>
+                                            <td>{{ forloop.counter }}</td>
                                             <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
                                             <td>{{ employee.company }}</td>
                                             <td>{{ employee.position }}</td>
@@ -61,7 +61,7 @@
                                                     <i class="fa fa-edit"></i> Update
                                                 </a>
 
-                                                <a class="btn btn-social bg-maroon" href="/employees/{{ employee.id }}/delete/">
+                                                <a class="btn btn-social bg-maroon open-Dialog" data-id="{{ employee.id }}" data-company-id="{{ employee.company.id }}">
                                                     <i class="fa fa-trash-o"></i> Delete
                                                 </a>
                                             </td>
@@ -76,6 +76,25 @@
                     </div>
                 </section>
             </div>
+
+            <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Confirmation Dialog</h4>
+                        </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this employee?
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-default" data-dismiss="modal">Close</a>
+                                <a id="delete" class="btn bg-maroon" href="">Delete</a>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         {% block footer %}
@@ -84,6 +103,14 @@
 
         {% block js %}
             {{ block.super }}
+            <script>
+                $("a.open-Dialog").click(function() {
+                    var employee_id = $(this).data("id")
+                    var company_id = $(".open-Dialog").data("company-id");
+                    $("#confirmationModal").modal("show");
+                    $("#delete").prop("href", "/employees/" + employee_id + "/delete/?company_id=" + company_id);
+                });
+            </script>
         {% endblock js %}
 
     </body>

@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.models import User as AuthUser
 
 from .forms import *
 from .models import Company, User, Tracker, SmsNotification
@@ -441,8 +442,8 @@ class UpdateEmployee(AdministratorView):
 
 class DeleteEmployee(AdministratorView):
     def get(self, request, employee_id, *args, **kwargs):
-        url = reverse('view_employee')
-        user = User.objects.filter(id=employee_id)
+        url = reverse('view_employee', kwargs={'company_id': request.GET.get('company_id')})
+        user = AuthUser.objects.filter(auth_user__id=employee_id).first()
         user.delete()
         return HttpResponseRedirect(url)
 
