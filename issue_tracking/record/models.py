@@ -121,9 +121,19 @@ class Issue(models.Model):
 
 
 class Thread(models.Model):
+    CALLOUTS = (('FYI', 'For Your Information'),
+                ('FC', 'For Compliance'),
+                ('FV', 'For Verication'),
+                ('ASAP', 'For Immediate Action'),
+                ('F/UP', 'Follow-Up'),
+                ('NA', 'Not Applicable'),
+                ('OK', 'Noted'),
+                ('FD', 'For Decision'))
+
     issue = models.ForeignKey(Issue, related_name='threads')
     assigned_to = models.ForeignKey(User, related_name='threads', null=True)
     note = models.TextField()
+    callout = models.CharField(max_length=200, choices=CALLOUTS, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='threads_created')
 

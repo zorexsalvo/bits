@@ -315,10 +315,10 @@ class AdminIssueView(AdministratorView):
                 timestamp = timezone.localtime(note.date_created).strftime("%m-%d-%Y %H:%M:%S")
                 if timestamp not in issues_directory:
                     thread = self.build_thread_array(issues.count())
-                    thread[counter] = note.note + "|" + note.assigned_to.color
+                    thread[counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
                     issues_directory[timestamp] = thread
                 else:
-                    issues_directory[timestamp][counter] = note.note + "|" + note.assigned_to.color
+                    issues_directory[timestamp][counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
             counter += 1
 
         return OrderedDict(sorted(issues_directory.items()))
@@ -392,6 +392,7 @@ class AdminIssueView(AdministratorView):
             thread = Thread(issue=issue,
                             assigned_to=user,
                             note=data.get('message'),
+                            callout=data.get('callout'),
                             created_by=User.objects.get(username=request.user))
             thread.save()
             return HttpResponseRedirect(url)

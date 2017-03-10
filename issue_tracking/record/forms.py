@@ -139,6 +139,7 @@ class RespondForm(forms.Form):
     description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description', 'readonly': ''}))
     assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control', 'id': 'assignedTo'}))
     decision = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+    callout = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
     message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
 
     def __init__(self, tracker_id, *args, **kwargs):
@@ -146,11 +147,21 @@ class RespondForm(forms.Form):
                     ('CLOSED', 'Closed'),
                     ('SLEEP', 'Sleep'),
                     ('DEAD', 'Dead'))
+        callout = (('FYI', 'For Your Information'),
+                   ('FC', 'For Compliance'),
+                   ('FV', 'For Verication'),
+                   ('ASAP', 'For Immediate Action'),
+                   ('F/UP', 'Follow-Up'),
+                   ('NA', 'Not Applicable'),
+                   ('OK', 'Noted'),
+                   ('FD', 'For Decision'))
+
         company = Tracker.objects.get(id=tracker_id).company
         choices = tuple([(x.id, str(x)) for x in User.objects.filter(Q(company=company) | Q(type='ADMINISTRATOR'))])
         super(RespondForm, self).__init__(*args, **kwargs)
         self.fields['assigned_to'].choices = choices
         self.fields['decision'].choices = decision
+        self.fields['callout'].choices = callout
 
 
 class ThreadForm(forms.ModelForm):
