@@ -122,6 +122,7 @@ class Issue(models.Model):
 
 class Thread(models.Model):
     issue = models.ForeignKey(Issue, related_name='threads')
+    assigned_to = models.ForeignKey(User, related_name='threads', null=True)
     note = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='threads_created')

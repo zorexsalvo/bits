@@ -1,4 +1,5 @@
 {% extends 'administrator/base.html' %} {% load staticfiles %} {% block content %}
+{% load key_values %}
 
 <body class="hold-transition skin-purple sidebar-mini fixed">
     <div class="wrapper">
@@ -52,7 +53,7 @@
                                                 <th class="open-RespondDialog"
                                                     data-id="{{ issue.id }}"
                                                     data-title="{{ issue }}"
-                                                    data-assign="{{ issue.assigned_to.id }}"
+                                                    data-assign="{{ issue.threads.last.assigned_to.id }}"
                                                     data-description="{{ issue.description }}">
                                                     Issue {{ issue.reference_id }}: {{ issue.title }} 
                                                     {% if issue.priority %}
