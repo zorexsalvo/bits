@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User as AuthUser
 from django.db.models import Q
+from colorfield.fields import ColorField
 from .models import *
 
 
@@ -63,6 +64,10 @@ class UserForm(forms.Form):
     company = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), queryset=Company.objects.all())
     position = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'}))
     picture = forms.ImageField()
+    color = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'data-palette': '["#D50000","#304FFE","#00B8D4","#00C853","#FFD600","#FF6D00","#FF1744","#3D5AFE","#00E5FF","#00E676","#FFEA00","#FF9100","#FF5252","#536DFE","#18FFFF","#69F0AE","#FFFF00","#FFAB40"]'
+    }))
     type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=TYPE)
 
     def clean(self):

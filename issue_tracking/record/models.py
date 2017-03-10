@@ -8,6 +8,8 @@ from django.dispatch import receiver
 
 from issue_tracker.roles import Administrator, Employee
 
+from colorfield.fields import ColorField
+
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
 
@@ -49,6 +51,7 @@ class User(models.Model):
     type = models.CharField(max_length=200, choices=TYPE)
     date_created = models.DateTimeField(auto_now_add=True)
     picture = models.ImageField(upload_to='images')
+    color = ColorField(default='#FF0000', null=True)
     access_token = models.CharField(max_length=200, blank=True, null=True)
     created_by = models.CharField(max_length=200)
 

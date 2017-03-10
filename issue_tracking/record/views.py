@@ -238,6 +238,7 @@ class CreateEmployee(AdministratorView):
             user.position = form.cleaned_data.get('position')
             user.created_by = request.user
             user.picture = form.cleaned_data.get('picture')
+            user.color = form.cleaned_data.get('color')
             user.save()
             messages.success(request, 'Text INFO to {} (Cross-telco: {}) to subscribe to SMS Notification.'.format(short_code, cross_telco))
             return HttpResponseRedirect(url)
