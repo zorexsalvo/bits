@@ -1,5 +1,5 @@
 {% extends 'administrator/base.html' %} {% load staticfiles %} {% block content %}
-{% load key_values %}
+{% load filters %}
 
 <body class="hold-transition skin-purple sidebar-mini fixed">
     <div class="wrapper">
@@ -81,7 +81,7 @@
                                             <tr>
                                                 <td>{{ issue }}</td>
                                                 {% for comment in comments %}
-                                                <td class="open-RespondDialog">{{ comment }}</td>
+                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog">{{ comment|getmessage }}</td>
                                                 {% endfor %}
                                             </tr>
                                             {% empty %}
