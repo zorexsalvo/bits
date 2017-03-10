@@ -12,7 +12,7 @@ def getcolor(string):
         index = string.index('|')
         return string[index+1:]
     except:
-        pass
+        return ''
 
 @register.filter
 def getmessage(string):
@@ -20,4 +20,4 @@ def getmessage(string):
         index = string.index('|')
         return string[:index]
     except:
-        pass
+        return ''
