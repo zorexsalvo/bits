@@ -439,6 +439,7 @@ class UpdateEmployee(AdministratorView):
             user.company = form.cleaned_data.get('company')
             user.position = form.cleaned_data.get('position')
             user.picture = form.cleaned_data.get('picture')
+            user.color = form.cleaned_data.get('color')
             user.save()
             messages.success(request, 'Employee has been updated successfully.')
             return HttpResponseRedirect(url)

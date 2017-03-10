@@ -94,7 +94,8 @@ class UpdateUserForm(forms.ModelForm):
             'mobile_number': forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}),
             'date_of_birth': forms.DateInput(attrs={'class': 'form-control pull right', 'id': 'datepicker', 'readonly': ''}),
             'company': forms.Select(attrs={'class': 'form-control'}),
-            'position': forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'})
+            'position': forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'}),
+            'color': forms.TextInput(attrs={'class': 'form-control', 'data-palette': '["#D50000","#304FFE","#00B8D4","#00C853","#FFD600","#FF6D00","#FF1744","#3D5AFE","#00E5FF","#00E676","#FFEA00","#FF9100","#FF5252","#536DFE","#18FFFF","#69F0AE","#FFFF00","#FFAB40"]'})
         }
 
 class TrackerForm(forms.ModelForm):

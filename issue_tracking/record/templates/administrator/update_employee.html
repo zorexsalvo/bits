@@ -84,6 +84,7 @@
                                             <div class="form-group">
                                                 <label>Photo</label> {{ form.picture }}
                                             </div>
+                                            {{ form.color }}
                                         </div>
                                     </div>
 
@@ -126,6 +127,11 @@
     //Date picker
     $('#datepicker').datepicker({
       autoclose: true
+    });
+</script>
+<script>
+    $('#id_color').paletteColorPicker({
+        clear_btn: 'last'
     });
 </script>
 {% endblock js %}
