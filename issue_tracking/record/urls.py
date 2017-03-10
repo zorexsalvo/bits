@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'employees/(?P<employee_id>\d+)/update/$', login_required(UpdateEmployee.as_view()), name='update_employee'),
     url(r'employees/(?P<employee_id>\d+)/delete/$', login_required(DeleteEmployee.as_view()), name='delete_employee'),
     url(r'dashboard/admin/$', login_required(AdminDashboard.as_view()), name='admin_dashboard'),
+    url(r'archive/$', login_required(ArchiveView.as_view()), name='archive'),
     url(r'dashboard/$', login_required(DashboardView.as_view()), name='dashboard'),
     url(r'issue/$', login_required(IssueView.as_view()), name='issue'),
     url(r'issue/(?P<issue_id>\d+)/thread/$', login_required(ThreadView.as_view()), name='thread'),

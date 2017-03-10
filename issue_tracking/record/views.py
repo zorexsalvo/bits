@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.models import User as AuthUser
+from django.db.models import Q
 
 from .forms import *
 from .models import Company, User, Tracker, SmsNotification
@@ -480,6 +481,20 @@ class AdminDashboard(AdministratorView):
         context = self.get_context(request)
         context['statistics'] = self.build_statistics()
         return render(request, self.template_name, context)
+
+
+class ArchiveView(AdministratorView):
+    template_name = 'administrator/archive.html'
+
+    def get(self, request, *args, **kwargs):
+        status = request.GET.get('status')
+        context = self.get_context(request)
+        context['status'] = status
+        context['issues'] = Issue.objects.filter(Q(decision=status) | Q(priority=status))
+        return render(request, self.template_name, context)
+
+
+# EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES
 
 class EmployeeView(HasRoleMixin, TemplateView):
     allowed_roles = [Employee,]
