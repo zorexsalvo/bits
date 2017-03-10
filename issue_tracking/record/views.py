@@ -289,12 +289,6 @@ class AdminIssueView(AdministratorView):
             thread.append("")
         return thread
 
-    def get_colors(self):
-        colors = {}
-        for user in User.objects.all():
-            colors[user.id] = user.color
-        return colors
-
     def get_issue_directory(self, tracker_id):
         issues_directory = {}
         issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
@@ -359,7 +353,6 @@ class AdminIssueView(AdministratorView):
         context['respond_form'] = respond_form
         context['assign_form'] = assign_form
         context['active_tracker'] = tracker_id
-        context['colors'] = self.get_colors()
         return render(request, self.template_name, context)
 
     def post(self, request, tracker_id, *args, **kwargs):
