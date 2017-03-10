@@ -57,7 +57,7 @@ class UserForm(forms.Form):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First Name', 'class': 'form-control'}))
     middle_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Middle Name', 'class': 'form-control'}), required=False)
     last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'form-control'}))
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control pull-right', 'id': 'datepicker'}))
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control pull-right', 'id': 'datepicker', 'readonly': ''}))
     sex = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=SEX)
     mobile_number = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}))
     company = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), queryset=Company.objects.all())
@@ -87,7 +87,7 @@ class UpdateUserForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'form-control'}),
             'sex': forms.Select(attrs={'class': 'form-control'}),
             'mobile_number': forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'form-control'}),
-            'date_of_birth': forms.DateInput(attrs={'class': 'form-control pull right', 'id': 'datepicker'}),
+            'date_of_birth': forms.DateInput(attrs={'class': 'form-control pull right', 'id': 'datepicker', 'readonly': ''}),
             'company': forms.Select(attrs={'class': 'form-control'}),
             'position': forms.TextInput(attrs={'placeholder': 'Position', 'class': 'form-control'})
         }
