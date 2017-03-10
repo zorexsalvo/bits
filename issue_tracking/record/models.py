@@ -107,7 +107,7 @@ class Issue(models.Model):
             Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
 
         if self.assigned_to:
-            url = '/issue/{}/thread/'.format(self.id)
+            url = '/trackers/{}/issues/'.format(self.tracker.id)
             title = '{} assigned you in an issue.'.format(self.created_by)
 
             Notification.objects.create(user=self.assigned_to,
@@ -132,7 +132,7 @@ class Thread(models.Model):
         tags = []
 
         if not self.issue.created_by == self.created_by:
-            url = '/issue/{}/thread/'.format(self.issue.id)
+            url = '/trackers/{}/issues/'.format(self.issue.tracker.id)
             title = '{} replied to your issue.'.format(self.created_by)
 
             Notification.objects.create(user=self.issue.created_by,
@@ -145,7 +145,6 @@ class Thread(models.Model):
                 if '@' in tag:
                     print(tag)
                     if User.objects.filter(username__username__icontains=tag[1:]).exists():
-                        print('alrigh')
 
                         title = '{} tagged you in an issue.'.format(self.created_by)
                         user = User.objects.filter(username__username__icontains=tag[1:]).first()

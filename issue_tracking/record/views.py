@@ -290,7 +290,7 @@ class AdminIssueView(AdministratorView):
 
     def get_issue_directory(self, tracker_id):
         issues_directory = {}
-        issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN')
+        issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
 
         counter = 0
         for issue in issues:
@@ -317,7 +317,7 @@ class AdminIssueView(AdministratorView):
         return OrderedDict(sorted(issues_directory.items()))
 
     def get_issue(self, tracker_id):
-        return Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN')
+        return Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
 
     def send_sms_notification(self, issue):
         issue = Issue.objects.filter(id=issue.id).first()
