@@ -118,7 +118,7 @@ class IssueForm(forms.ModelForm):
 class AssignForm(forms.Form):
     issue_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control', 'id': 'issue_id'}))
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title', 'readonly': ''}))
-    assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+    assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control', 'id': 'assignedTo'}))
     priority = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'id': 'priority'}))
     description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
 
@@ -136,7 +136,7 @@ class RespondForm(forms.Form):
     issue_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'form-control', 'id': 'issue_id'}))
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'title', 'readonly': ''}))
     description = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id':'description', 'readonly': ''}))
-    assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+    assigned_to = forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control', 'id': 'assignedTo'}))
     decision = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
     message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
 

@@ -52,7 +52,7 @@
                                                 <th class="open-RespondDialog"
                                                     data-id="{{ issue.id }}"
                                                     data-title="{{ issue }}"
-                                                    data-assign="{{ issue.assigned_to }}"
+                                                    data-assign="{{ issue.assigned_to.id }}"
                                                     data-description="{{ issue.description }}">
                                                     Issue {{ issue.reference_id }}: {{ issue.title }} 
                                                     {% if issue.priority %}
@@ -182,6 +182,7 @@
                 $(".modal-body #title").val(issueTitle);
                 $(".modal-body #issue_id").val(issueId);
                 $(".modal-body #description").val(issueDescription);
+                $(".modal-body #assignedTo").val(assignedTo);
 
                 if (issueDescription == 'None') {
                     $('#assignModal').modal('show');

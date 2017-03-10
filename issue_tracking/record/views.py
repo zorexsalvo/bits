@@ -379,6 +379,8 @@ class AdminIssueView(AdministratorView):
         if respond_form.is_valid():
             data = respond_form.cleaned_data
             issue = Issue.objects.get(id=data.get('issue_id'))
+            user = User.objects.get(id=data.get('assigned_to'))
+            issue.assigned_to = user
             issue.decision = data.get('decision')
             issue.save()
             thread = Thread(issue=issue,
