@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<body class="hold-transition skin-purple sidebar-mini">
+<body class="hold-transition skin-purple sidebar-mini fixed">
     <div class="wrapper">
 
         <header class="main-header">
@@ -33,20 +33,13 @@
                 <div class="row">
                     <div class="col-xs-12">
 
-                        {% if request == 'POST' %}
-                            {% if form.non_field_errors %}
-                                {% for error in form.non_field_errors %}
-                                    <div class="alert alert-warning alert-dismissible">
-                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                        <i class="icon fa fa-warning"></i> {{ error }}
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="alert alert-success alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                    Text INFO to 21584020 (Cross-telco: 29290584652) to subscribe to SMS Notification.
-                                </div>
-                            {% endif %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <i class="icon fa fa-{{ message.tags }}"></i>{{ message }}
+                        </div>
+                        {% endfor %}
                         {% endif %}
 
                         <div class="box">
@@ -117,6 +110,7 @@
                                                 <label>Photo</label>
                                                 {{ form.picture }}
                                             </div>
+                                                {{ form.color }}
                                         </div>
                                     </div>
 
@@ -165,6 +159,11 @@
     //Date picker
     $('#datepicker').datepicker({
       autoclose: true
+    });
+</script>
+<script>
+    $('#id_color').paletteColorPicker({
+        clear_btn: 'last'
     });
 </script>
 {% endblock js %}

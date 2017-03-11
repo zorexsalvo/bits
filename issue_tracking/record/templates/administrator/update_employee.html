@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<body class="hold-transition skin-purple sidebar-mini">
+<body class="hold-transition skin-purple sidebar-mini fixed">
     <div class="wrapper">
 
         <header class="main-header">
@@ -32,105 +32,83 @@
             <section class="content">
                 <div class="row">
                     <div class="col-xs-12">
-                    <div class="box">
-                        <form role="form" method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="box-body">
-                                <div class="box box-solid">
-                                    {{ form.username }}
-                                    {{ form.type }}
-                                    <div class="box-header with-border">
-                                    <h4 class="box-title">Personal Details</h4>
-                                    </div>
-                                    <div class="box-body">
-                                        <div class="form-group">
-                                            <label>First Name</label>
-                                            {{ form.first_name }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Middle Name</label>
-                                            {{ form.middle_name }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Last Name</label>
-                                            {{ form.last_name }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Sex</label>
-                                            {{ form.sex }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Date of Birth</label>
-                                            <div class="input-group date">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-calendar"></i>
-                                            </div>
-                                                {{ form.date_of_birth }}
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Mobile Number</label>
-                                            <div class="input-group date">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-mobile"></i>
-                                            </div>
-                                                {{ form.mobile_number }}
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Photo</label>
-                                            {{ form.picture }}
-                                        </div>
-                                    </div>
-                                </div>
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <i class="icon fa fa-{% if message.tags == 'success' %}check{% else %}{{ message.tags }}{% endif %}"></i> {{ message }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
 
-                                <div class="box box-solid">
-                                    <div class="box-header with-border">
-                                    <h4 class="box-title">Employement Details</h4>
-                                    </div>
-                                    <div class="box-body">
-                                        <div class="form-group">
-                                            <label>Company</label>
-                                            {{ form.company }}
+                        <div class="box">
+                            <form role="form" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="box-body">
+                                    <div class="box box-solid">
+                                        {{ form.username }} {{ form.type }}
+                                        <div class="box-header with-border">
+                                            <h4 class="box-title">Personal Details</h4>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Position</label>
-                                            {{ form.position }}
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label>First Name</label> {{ form.first_name }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Middle Name</label> {{ form.middle_name }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Last Name</label> {{ form.last_name }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Sex</label> {{ form.sex }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Date of Birth</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    {{ form.date_of_birth }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Mobile Number</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-mobile"></i>
+                                                    </div>
+                                                    {{ form.mobile_number }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Photo</label> {{ form.picture }}
+                                            </div>
+                                            {{ form.color }}
+                                        </div>
+                                    </div>
+
+                                    <div class="box box-solid">
+                                        <div class="box-header with-border">
+                                            <h4 class="box-title">Employement Details</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label>Company</label> {{ form.company }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Position</label> {{ form.position }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                          <!-- /.box-body -->
-                            <div class="box-footer">
-                                <button type="submit" value="Update" class="btn btn-primary">Update</button>
-                            </div>
-                              </div>
-                                <!-- MODAL -->
-                                <div class="modal fade" id="cfModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="myModalLabel">Update Employee</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                {% if form.non_field_errors %}
-                                                    {% for error in form.non_field_errors %}
-                                                        {{ error }}
-                                                    {% endfor %}
-                                                {% else %}
-                                                    Employee has been updated successfully.
-                                                {% endif %}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- /.box-body -->
+                                <div class="box-footer">
+                                    <button type="submit" value="Update" class="btn btn-primary">Update</button>
                                 </div>
-                                <!-- MODAL -->
-                        </form>
+                            </form>
+                        </div>
                     </div>
-
                 </div>
             </section>
         </div>
@@ -145,17 +123,15 @@
 {% block js %}
 {{ block.super }}
 <script src="{% static 'plugins/datepicker/bootstrap-datepicker.js' %}"></script>
-{% if request == 'POST' %}
-<script type="text/javascript">
-    $(window).load(function(){
-        $('#cfModal').modal('show');
-    });
-</script>
-{% endif %}
 <script>
     //Date picker
     $('#datepicker').datepicker({
       autoclose: true
+    });
+</script>
+<script>
+    $('#id_color').paletteColorPicker({
+        clear_btn: 'last'
     });
 </script>
 {% endblock js %}

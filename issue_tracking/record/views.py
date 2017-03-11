@@ -8,10 +8,19 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth.models import User as AuthUser
+from django.db.models import Q
 
 from .forms import *
 from .models import Company, User, Tracker, SmsNotification
 from issue_tracker.config import sys_config
+
+from issue_tracker.roles import Administrator, Employee
+from rolepermissions.mixins import HasRoleMixin
+
+from collections import OrderedDict
 
 import json
 import requests
@@ -37,6 +46,18 @@ def notification_view(request, notification_id):
     return HttpResponseRedirect(url)
 
 
+def http_403_permission_denied(request):
+    return render(request, 'error/403.html')
+
+
+def http_404_not_found(request):
+    return render(request, 'error/404.html')
+
+
+def http_500_server_error(request):
+    return render(request, 'error/500.html')
+
+
 class UsernameLoginView(TemplateView):
     form_class = UsernameForm
     template_name = 'security/user_login.html'
@@ -51,9 +72,15 @@ class UsernameLoginView(TemplateView):
         return url
 
     def get(self, request, *args, **kwargs):
+        redirect_map = {
+            'EMPLOYEE': 'dashboard',
+            'ADMINISTRATOR': 'admin_dashboard'
+        }
+
         form = self.form_class()
         if request.user.is_authenticated():
-            url = reverse('dashboard')
+            user = User.objects.get(username=request.user)
+            url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form})
 
@@ -76,16 +103,36 @@ class LoginView(TemplateView):
 
         form = self.form_class({'username': request.GET.get('username')})
 
+        redirect_map = {
+            'EMPLOYEE': 'dashboard',
+            'ADMINISTRATOR': 'admin_dashboard'
+        }
+
+        if user is None:
+            url = reverse('username_login')
+            return HttpResponseRedirect(url)
+
         if request.user.is_authenticated():
-            url = reverse('dashboard')
+            user = User.objects.get(username=request.user)
+            url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, {'form': form, 'user': user})
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.filter(username__username=request.GET.get('username')).first()
+        redirect_map = {
+            'EMPLOYEE': 'dashboard',
+            'ADMINISTRATOR': 'admin_dashboard'
+        }
+
+        username = request.GET.get('username')
+        user = User.objects.filter(username__username=username).first()
+
+        if user is None:
+            url = reverse('username_login')
+            return HttpResponseRedirect(url)
 
         form = self.form_class(request.POST)
-        url = reverse('dashboard')
+        url = reverse(redirect_map[user.type])
         if form.is_valid():
             user = form.login(request)
             _login = login(request, user)
@@ -93,7 +140,8 @@ class LoginView(TemplateView):
         return render(request, self.template_name, {'form': form, 'user':user})
 
 
-class AdministratorView(TemplateView):
+class AdministratorView(HasRoleMixin, TemplateView):
+    allowed_roles = [Administrator,]
     def get_companies(self):
         return Company.objects.all()
 
@@ -124,16 +172,19 @@ class CreateCompany(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        url = reverse('create_company')
         context = self.get_context(request)
         form = self.form_class(request.POST or None)
-        context['request'] = 'POST'
 
         if form.is_valid():
             name = form.cleaned_data.get('name')
             company = Company(name=name)
             company.save()
-            context['form'] = self.form_class()
-            return render(request, self.template_name, context)
+            messages.success(request, 'Company has created successfully!')
+            return HttpResponseRedirect(url)
+        else:
+            messages.warning(request, 'Company already exists.')
+            return HttpResponseRedirect(url)
 
         context['form'] = self.form_class()
         return render(request, self.template_name, context)
@@ -142,12 +193,13 @@ class CreateCompany(AdministratorView):
 class ViewEmployee(AdministratorView):
     template_name = 'administrator/view_employee.html'
 
-    def get_employees(self):
-        return User.objects.all()
+    def get_employees(self, company_id):
+        return User.objects.filter(company__id=company_id)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, company_id, *args, **kwargs):
         context = self.get_context(request)
-        context['employees'] = self.get_employees()
+        context['company'] = Company.objects.get(id=company_id)
+        context['employees'] = self.get_employees(company_id)
         return render(request, self.template_name, context)
 
 
@@ -165,9 +217,12 @@ class CreateEmployee(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        short_code = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        cross_telco = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'cross_telco')
+        url = reverse('create_employee')
         context = self.get_context(request)
         form = self.form_class(request.POST or None, request.FILES or None)
-        context['request'] = 'POST'
+        context['form'] = form
 
         if form.is_valid():
             auth_user = self._save_user(form.cleaned_data.get('username'), form.cleaned_data.get('password'))
@@ -184,10 +239,13 @@ class CreateEmployee(AdministratorView):
             user.position = form.cleaned_data.get('position')
             user.created_by = request.user
             user.picture = form.cleaned_data.get('picture')
+            user.color = form.cleaned_data.get('color')
             user.save()
-            context['form'] = self.form_class()
-            return render(request, self.template_name, context)
-        context['form'] = self.form_class()
+            messages.success(request, 'Text INFO to {} (Cross-telco: {}) to subscribe to SMS Notification.'.format(short_code, cross_telco))
+            return HttpResponseRedirect(url)
+        else:
+            messages.warning(request, 'User already exists.')
+            return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
 
@@ -197,21 +255,153 @@ class CreateTracker(AdministratorView):
 
     def get(self, request, company_id, *args, **kwargs):
         context = self.get_context(request)
-        context['form'] = self.form_class()
+        context['form'] = self.form_class(initial={'company': company_id})
+        context['company'] = Company.objects.get(id=company_id)
         return render(request, self.template_name, context)
 
     def post(self, request, company_id, *args, **kwargs):
+        url = reverse('create_tracker', kwargs={'company_id': company_id})
         context = self.get_context(request)
-        form = self.form_class(request.POST or None)
-        context['request'] = 'POST'
+        company = Company.objects.get(id=company_id)
+        form = self.form_class(request.POST or None, initial={'company': company.id})
+        context['form'] = form
+        context['company'] = company
 
         if form.is_valid():
-            tracker = Tracker.objects.create(name=form.cleaned_data.get('tracker'),
-                                             company=Company.objects.get(id=company_id))
-            context['form'] = self.form_class()
-            return render(request, self.template_name, context)
+            form.save()
+            messages.success(request, 'Tracker has been created successfully!')
+            return HttpResponseRedirect(url)
+        else:
+            messages.warning(request, 'Tracker already exists.')
+            return HttpResponseRedirect(url)
 
-        context['form'] = self.form_class()
+        return render(request, self.template_name, context)
+
+
+class AdminIssueView(AdministratorView):
+    template_name = 'administrator/issue.html'
+    form_class = IssueForm
+    respond_form_class = RespondForm
+    assign_form_class = AssignForm
+
+    def build_thread_array(self, count):
+        thread = []
+        for x in range(count):
+            thread.append("")
+        return thread
+
+    def get_issue_directory(self, tracker_id):
+        issues_directory = {}
+        issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+
+        counter = 0
+        for issue in issues:
+            timestamp = timezone.localtime(issue.date_created).strftime("%m-%d-%Y %H:%M:%S")
+            if timestamp not in issues_directory:
+                thread = self.build_thread_array(issues.count())
+                if issue.description:
+                    thread[counter] = issue.description + "|" + issue.assigned_to.color
+                    issues_directory[timestamp] = thread
+            else:
+                if issue.description:
+                    issues_directory[timestamp][counter] = issue.description
+
+            for note in issue.threads.all():
+                timestamp = timezone.localtime(note.date_created).strftime("%m-%d-%Y %H:%M:%S")
+                if timestamp not in issues_directory:
+                    thread = self.build_thread_array(issues.count())
+                    thread[counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
+                    issues_directory[timestamp] = thread
+                else:
+                    issues_directory[timestamp][counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
+            counter += 1
+
+        return OrderedDict(sorted(issues_directory.items()))
+
+    def get_issue(self, tracker_id):
+        return Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+
+    def send_sms_notification(self, issue):
+        issue = Issue.objects.filter(id=issue.id).first()
+        sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+
+        sms_notification = SmsNotification.objects.filter(priority=issue.priority, active=True).first()
+
+        if sms_notification is not None:
+            sms_payload = {
+                'address': issue.assigned_to.mobile_number,
+                'message': sms_notification.sms.format(reference_id=issue.reference_id, title=issue.title, created_by=issue.created_by)
+            }
+
+            try:
+                response = requests.post(sms_uri, data=sms_payload)
+                logging.info(response.text)
+            except requests.exceptions.ProxyError as e:
+                logging.error(e)
+            except requests.exceptions.ConnectionError as f:
+                logging.error(f)
+
+    def get(self, request, tracker_id, *args, **kwargs):
+        form = self.form_class()
+        respond_form = self.respond_form_class(tracker_id)
+        assign_form = self.assign_form_class(tracker_id)
+        context = self.get_context(request)
+        context['issues'] = self.get_issue(tracker_id)
+        context['issue_directory'] = self.get_issue_directory(tracker_id)
+        context['tracker'] = Tracker.objects.get(id=tracker_id)
+        context['form'] = form
+        context['respond_form'] = respond_form
+        context['assign_form'] = assign_form
+        context['active_tracker'] = tracker_id
+        return render(request, self.template_name, context)
+
+    def post(self, request, tracker_id, *args, **kwargs):
+        url = reverse('admin_tracker_issue', kwargs={'tracker_id':tracker_id})
+        form = self.form_class(request.POST or None)
+        assign_form = self.assign_form_class(tracker_id, request.POST or None)
+        respond_form = self.respond_form_class(tracker_id, request.POST or None)
+        context = self.get_context(request)
+        context['issues'] = self.get_issue(tracker_id)
+        context['issue_directory'] = self.get_issue_directory(tracker_id)
+        context['respond_form'] = respond_form
+        context['active_tracker'] = tracker_id
+        context['assign_form'] = assign_form
+        context['tracker'] = Tracker.objects.get(id=tracker_id)
+        context['form'] = form
+
+        if form.is_valid() and request.POST.get('issue_id') == None:
+            data = form.cleaned_data
+            data['tracker'] = Tracker.objects.get(id=tracker_id)
+            data['created_by'] = User.objects.get(username=request.user)
+            issue = Issue.objects.create(**data)
+            return HttpResponseRedirect(url)
+
+        if respond_form.is_valid():
+            data = respond_form.cleaned_data
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            user = User.objects.get(id=data.get('assigned_to'))
+            issue.decision = data.get('decision')
+            issue.save()
+            thread = Thread(issue=issue,
+                            assigned_to=user,
+                            note=data.get('message'),
+                            callout=data.get('callout'),
+                            created_by=User.objects.get(username=request.user))
+            thread.save()
+            return HttpResponseRedirect(url)
+
+        if assign_form.is_valid():
+            data = assign_form.cleaned_data
+            user = User.objects.get(id=data.get('assigned_to'))
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            issue.priority = data.get('priority')
+            issue.assigned_to = user
+            issue.description = data.get('description')
+            issue.date_created = timezone.now()
+            issue.save()
+            return HttpResponseRedirect(url)
+
         return render(request, self.template_name, context)
 
 
@@ -227,74 +417,88 @@ class UpdateEmployee(AdministratorView):
         return render(request, self.template_name, context)
 
     def post(self, request, employee_id, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
+        url = reverse('update_employee', kwargs={'employee_id': employee_id})
+        user = User.objects.get(id=employee_id)
+        form = self.form_class(request.POST or None, request.FILES or None, instance=user)
         context = self.get_context(request)
-        context['request'] = 'POST'
+        context['form'] = form
 
         if form.is_valid():
-            user = User.objects.filter(id=employee_id)
-            user.update(
-                first_name = form.cleaned_data.get('first_name'),
-                middle_name = form.cleaned_data.get('middle_name'),
-                last_name = form.cleaned_data.get('last_name'),
-                sex = form.cleaned_data.get('sex'),
-                date_of_birth = form.cleaned_data.get('date_of_birth'),
-                mobile_number = form.cleaned_data.get('mobile_number'),
-                company = form.cleaned_data.get('company'),
-                position = form.cleaned_data.get('position'),
-                picture = '/images/' + str(form.cleaned_data.get('picture'))
-            )
-            context['form'] = form
-            return render(request, self.template_name, context)
+            user = User.objects.get(id=employee_id)
+            user.first_name = form.cleaned_data.get('first_name')
+            user.middle_name = form.cleaned_data.get('middle_name')
+            user.last_name = form.cleaned_data.get('last_name')
+            user.sex = form.cleaned_data.get('sex')
+            user.date_of_birth = form.cleaned_data.get('date_of_birth')
+            user.mobile_number = form.cleaned_data.get('mobile_number')
+            user.company = form.cleaned_data.get('company')
+            user.position = form.cleaned_data.get('position')
+            user.picture = form.cleaned_data.get('picture')
+            user.color = form.cleaned_data.get('color')
+            user.save()
+            messages.success(request, 'Employee has been updated successfully.')
+            return HttpResponseRedirect(url)
+        else:
+            print(form.errors)
+            messages.warning(request, 'Update is not successful.')
+            return HttpResponseRedirect(url)
 
-        context['form'] = form
         return render(request, self.template_name, context)
 
 
 class DeleteEmployee(AdministratorView):
     def get(self, request, employee_id, *args, **kwargs):
-        url = reverse('view_employee')
-        user = User.objects.filter(id=employee_id)
+        url = reverse('view_employee', kwargs={'company_id': request.GET.get('company_id')})
+        user = AuthUser.objects.filter(auth_user__id=employee_id).first()
         user.delete()
         return HttpResponseRedirect(url)
 
 
-class AdminThreadView(AdministratorView):
-    template_name = 'administrator/thread.html'
-    form_class = ThreadForm
+class AdminDashboard(AdministratorView):
+    template_name = 'administrator/dashboard.html'
 
-    def get_object(self, issue_id):
-        try:
-            return Issue.objects.get(id=issue_id)
-        except Issue.DoesNotExist:
-            None
+    def build_statistics(self):
+        statistics = OrderedDict()
+        open = Issue.objects.filter(decision='OPEN').count()
+        sleep = Issue.objects.filter(decision='SLEEP').count()
+        closed = Issue.objects.filter(decision='CLOSED').count()
+        dead = Issue.objects.filter(decision='DEAD').count()
+        low = Issue.objects.filter(priority='LOW').count()
+        normal = Issue.objects.filter(priority='NORMAL').count()
+        high = Issue.objects.filter(priority='HIGH').count()
 
-    def get(self, request, issue_id, *args, **kwargs):
+        statistics['open'] = open
+        statistics['sleep'] = sleep
+        statistics['closed'] = closed
+        statistics['dead'] = dead
+        statistics['low'] = low
+        statistics['normal'] = normal
+        statistics['high'] = high
+
+        return statistics
+
+    def get(self, request, *args, **kwargs):
         context = self.get_context(request)
-        context['form'] = self.form_class()
-        context['issue'] = self.get_object(issue_id)
-        context['thread'] = Thread.objects.filter(issue__id=issue_id)
-
-        return render(request, self.template_name, context)
-
-    def post(self, request, issue_id, *args, **kwargs):
-        context = self.get_context(request)
-        form = self.form_class(request.POST or None)
-        context['form'] = form
-        context['issue'] = self.get_object(issue_id)
-        context['thread'] = Thread.objects.filter(issue__id=issue_id)
-
-        if form.is_valid():
-            data = form.cleaned_data
-            data['issue'] = Issue.objects.get(id=issue_id)
-            data['created_by'] = User.objects.get(username=request.user)
-            Thread.objects.create(**data)
-
-        context['form'] = self.form_class()
+        context['statistics'] = self.build_statistics()
         return render(request, self.template_name, context)
 
 
-class UserView(TemplateView):
+class ArchiveView(AdministratorView):
+    template_name = 'administrator/archive.html'
+
+    def get(self, request, *args, **kwargs):
+        status = request.GET.get('status')
+        context = self.get_context(request)
+        context['status'] = status
+        context['issues'] = Issue.objects.filter(Q(decision=status) | Q(priority=status))
+        return render(request, self.template_name, context)
+
+
+# EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES
+
+class EmployeeView(HasRoleMixin, TemplateView):
+    allowed_roles = [Employee,]
+
     def get_user(self, request):
         return  User.objects.filter(username=request.user).first()
 
@@ -309,7 +513,7 @@ class UserView(TemplateView):
         return context
 
 
-class DashboardView(UserView):
+class DashboardView(EmployeeView):
     template_name = 'user/index.html'
 
     def get(self, request, *args, **kwargs):
@@ -317,7 +521,7 @@ class DashboardView(UserView):
         return render(request, self.template_name, context)
 
 
-class IssueView(UserView):
+class IssueView(EmployeeView):
     template_name = 'user/issue.html'
     form_class = IssueForm
 
@@ -370,7 +574,7 @@ class IssueView(UserView):
         return render(request, self.template_name, context)
 
 
-class UserDirectoryView(UserView):
+class UserDirectoryView(EmployeeView):
     template_name = 'user/user.html'
 
     def get(self, request, *args, **kwargs):
@@ -379,7 +583,7 @@ class UserDirectoryView(UserView):
         return render(request, self.template_name, context)
 
 
-class CheckView(UserView):
+class CheckView(EmployeeView):
     template_name = 'user/check.html'
     form_class = CheckForm
 
@@ -399,7 +603,7 @@ class CheckView(UserView):
         return render(request, self.template_name, context)
 
 
-class ThreadView(UserView):
+class ThreadView(EmployeeView):
     template_name = 'user/thread.html'
     form_class = ThreadForm
 

@@ -24,7 +24,7 @@
                         <ul class="menu">
                             {% for notification in notifications %}
                             <li>
-                                <a href="/notifications/{{ notification.id }}/?q=administrator/" {% if notification.read == False %} style="background: #E7DFDD; text-decoration: none;"{% endif %}>
+                                <a href="/notifications/{{ notification.id }}/" {% if notification.read == False %} style="background: #E7DFDD; text-decoration: none;"{% endif %}>
                                     {% if notification.category == 'ISSUE' %}
                                         <i class="fa fa-warning text-yellow"></i>
                                     {% else %}
@@ -62,9 +62,6 @@
                     </li>
 
                     <li class="user-footer">
-                        <div class="pull-left">
-                            <a href="/dashboard/" class="btn btn-default btn-flat">Go to Support Center</a>
-                        </div>
                         <div class="pull-right">
                             <a href="/logout/" class="btn btn-default btn-flat">Sign out</a>
                         </div>

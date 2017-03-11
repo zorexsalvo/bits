@@ -4,3 +4,5 @@ Pillow==3.4.2
 uWSGI==2.0.14
 six==1.10
 requests==2.13.0
+django-role-permissions==1.2.1
+django-colorfield

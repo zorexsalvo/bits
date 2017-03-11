@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'record',
+    'rolepermissions',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +128,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DEFAULT_ENVIRONMENT = os.getenv('DEFAULT_ENVIRONMENT', 'development')
+
+ROLEPERMISSIONS_MODULE = 'issue_tracker.roles'
