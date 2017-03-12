@@ -553,10 +553,42 @@ class IssueView(EmployeeView):
     template_name = 'user/issue.html'
     form_class = IssueForm
 
-    def get_issue(self, user):
-        if user:
-            return Issue.objects.filter(created_by__company__id=user.company.id).order_by('-id')
-        return Issue.objects.all()
+    def build_thread_array(self, count):
+        thread = []
+        for x in range(count):
+            thread.append("")
+        return thread
+
+    def get_issue_directory(self, tracker_id):
+        issues_directory = {}
+        issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+
+        counter = 0
+        for issue in issues:
+            timestamp = timezone.localtime(issue.date_created).strftime("%m-%d-%Y %H:%M:%S")
+            if timestamp not in issues_directory:
+                thread = self.build_thread_array(issues.count())
+                if issue.description:
+                    thread[counter] = issue.description + "|" + issue.assigned_to.color
+                    issues_directory[timestamp] = thread
+            else:
+                if issue.description:
+                    issues_directory[timestamp][counter] = issue.description
+
+            for note in issue.threads.all():
+                timestamp = timezone.localtime(note.date_created).strftime("%m-%d-%Y %H:%M:%S")
+                if timestamp not in issues_directory:
+                    thread = self.build_thread_array(issues.count())
+                    thread[counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
+                    issues_directory[timestamp] = thread
+                else:
+                    issues_directory[timestamp][counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
+            counter += 1
+
+        return OrderedDict(sorted(issues_directory.items()))
+
+    def get_issue(self, tracker_id):
+        return Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
 
     def send_sms_notification(self, issue):
         issue = Issue.objects.filter(id=issue.id).first()
@@ -579,17 +611,18 @@ class IssueView(EmployeeView):
             except requests.exceptions.ConnectionError as f:
                 logging.error(f)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, tracker_id, *args, **kwargs):
         form = self.form_class()
         context = self.get_context(request)
-        context['issues'] = self.get_issue(context['user'])
+        context['issues'] = self.get_issue(tracker_id)
+        context['issue_directory'] = self.get_issue_directory(tracker_id)
+        context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST or None)
         context = self.get_context(request)
-        context['issues'] = self.get_issue(context['user'])
         context['form'] = form
 
         if form.is_valid():

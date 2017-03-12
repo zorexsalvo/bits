@@ -26,7 +26,7 @@
     <ul class="sidebar-menu">
         <li class="{% if active_tab == 'dashboard' %}active{% endif %}"><a href="/dashboard/"><i class="fa fa-edit"></i> <span>Dashboard</span></a></li>
 
-        <li class="treeview {% if active_tab == 'open_companies' %}active{% endif %}">
+        <li class="treeview {% if active_tab == 'open_trackers' %}active{% endif %}">
             <a href="#">
                 <i class="fa fa-share"></i> <span>Open Trackers</span>
                 <span class="pull-right-container">
@@ -35,16 +35,16 @@
             </a>
             <ul class="treeview-menu">
                 {% for tracker in trackers %}
-                <li class="">
-                    <a href="#">
-                        <i class="fa fa-building"></i> <span>{{ tracker }}</span>
+                <li class="{% if tracker.id == active_tracker.id %}active{% endif %}">
+                    <a href="/trackers/{{ tracker.id }}/issues/employee/">
+                        <i class="fa fa-map-marker"></i> <span>{{ tracker }}</span>
                         </span>
                     </a>
                 </li>
                 {% empty %}
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-building"></i> <span>No trackers found.</span>
+                        <i class="fa fa-map-marker"></i> <span>No trackers found.</span>
                     </a>
                 </li>
                 {% endfor %}
