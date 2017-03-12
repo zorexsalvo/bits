@@ -669,15 +669,35 @@ class IssueView(EmployeeView):
 
 class EmployeeArchiveView(EmployeeView):
     template_name = 'user/archive.html'
+    search_form_class = SearchForm
 
     def get(self, request, *args, **kwargs):
         status = request.GET.get('status')
+        q = request.GET.get('q')
+
         context = self.get_context(request)
         context['status'] = status
+
         user = User.objects.get(username=request.user)
         issue = Issue.objects.filter(tracker__company=user.company)
-        context['issues'] = issue.filter(Q(decision=status) | Q(priority=status))
+        issue = issue.filter(Q(decision=status) | Q(priority=status))
+
+        if q:
+            issue = issue.filter(Q(title__icontains=q) | Q(tracker__name__icontains=q))
+
+        context['issues'] = issue
+        context['search'] = self.search_form_class()
         return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.search_form_class(request.POST or None)
+        status = request.GET.get('status')
+        url = reverse('archive_employee')
+
+        if form.is_valid():
+            q = form.cleaned_data.get('q')
+            return HttpResponseRedirect(url + '?status={}&q={}'.format(status, q))
+        return HttpResponseRedirect(url + '?status={}'.format(status))
 
 
 @method_decorator(csrf_exempt, name='dispatch')

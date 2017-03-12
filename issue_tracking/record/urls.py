@@ -18,6 +18,6 @@ urlpatterns = [
     url(r'archive/$', login_required(ArchiveView.as_view()), name='archive'),
     url(r'dashboard/$', login_required(DashboardView.as_view()), name='dashboard'),
     url(r'trackers/(?P<tracker_id>\d+)/issues/employee/$', login_required(IssueView.as_view()), name='issue'),
-    url(r'archive/employee/$', login_required(EmployeeArchiveView.as_view()), name='archive_emloployee'),
+    url(r'archive/employee/$', login_required(EmployeeArchiveView.as_view()), name='archive_employee'),
     url(r'v1/notify_uri', SMSView.as_view(), name='notify_uri'),
 ]
