@@ -192,15 +192,29 @@ class CreateCompany(AdministratorView):
 
 class ViewEmployee(AdministratorView):
     template_name = 'administrator/view_employee.html'
+    form_class = SearchForm
 
-    def get_employees(self, company_id):
-        return User.objects.filter(company__id=company_id)
+    def get_employees(self, company_id, q=None):
+        user = User.objects.filter(company__id=company_id)
+        if q:
+            user = user.filter(Q(first_name__icontains=q) | Q(middle_name__icontains=q) | Q(last_name__icontains=q) | Q(position__icontains=q))
+        return user
 
     def get(self, request, company_id, *args, **kwargs):
+        q = request.GET.get('q')
         context = self.get_context(request)
         context['company'] = Company.objects.get(id=company_id)
-        context['employees'] = self.get_employees(company_id)
+        context['employees'] = self.get_employees(company_id, q)
+        context['search'] = self.form_class()
         return render(request, self.template_name, context)
+
+    def post(self, request, company_id, *args, **kwargs):
+        url = reverse('view_employee', kwargs={'company_id': company_id})
+        form = self.form_class(request.POST or None)
+
+        if form.is_valid():
+            q = form.cleaned_data.get('q')
+            return HttpResponseRedirect(url + '?q={}'.format(q))
 
 
 class CreateEmployee(AdministratorView):
