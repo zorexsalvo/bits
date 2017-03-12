@@ -283,6 +283,7 @@ class AdminIssueView(AdministratorView):
     form_class = IssueForm
     respond_form_class = RespondForm
     assign_form_class = AssignForm
+    search_form_class = SearchForm
 
     def build_thread_array(self, count):
         thread = []
@@ -290,9 +291,12 @@ class AdminIssueView(AdministratorView):
             thread.append("")
         return thread
 
-    def get_issue_directory(self, tracker_id):
+    def get_issue_directory(self, tracker_id, q=None):
         issues_directory = {}
         issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+
+        if q:
+            issues = issues.filter(Q(title__icontains=q) | Q(reference_id__icontains=q) | Q(priority__icontains=q))
 
         counter = 0
         for issue in issues:
@@ -318,8 +322,11 @@ class AdminIssueView(AdministratorView):
 
         return OrderedDict(sorted(issues_directory.items()))
 
-    def get_issue(self, tracker_id):
-        return Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+    def get_issue(self, tracker_id, q=None):
+        issue = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+        if q:
+            return issue.filter(Q(title__icontains=q) | Q(reference_id__icontains=q) | Q(priority__icontains=q))
+        return issue
 
     def send_sms_notification(self, issue):
         issue = Issue.objects.filter(id=issue.id).first()
@@ -344,13 +351,15 @@ class AdminIssueView(AdministratorView):
 
     def get(self, request, tracker_id, *args, **kwargs):
         form = self.form_class()
+        q = request.GET.get('q')
         respond_form = self.respond_form_class(tracker_id)
         assign_form = self.assign_form_class(tracker_id)
         context = self.get_context(request)
-        context['issues'] = self.get_issue(tracker_id)
-        context['issue_directory'] = self.get_issue_directory(tracker_id)
+        context['issues'] = self.get_issue(tracker_id, q)
+        context['issue_directory'] = self.get_issue_directory(tracker_id, q)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
+        context['search'] = self.search_form_class()
         context['respond_form'] = respond_form
         context['assign_form'] = assign_form
         context['active_tracker'] = tracker_id
@@ -361,6 +370,7 @@ class AdminIssueView(AdministratorView):
         form = self.form_class(request.POST or None)
         assign_form = self.assign_form_class(tracker_id, request.POST or None)
         respond_form = self.respond_form_class(tracker_id, request.POST or None)
+        search_form = self.search_form_class(request.POST or None)
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
         context['issue_directory'] = self.get_issue_directory(tracker_id)
@@ -369,6 +379,10 @@ class AdminIssueView(AdministratorView):
         context['assign_form'] = assign_form
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['form'] = form
+
+        if search_form.is_valid():
+            q = search_form.cleaned_data.get('q')
+            return HttpResponseRedirect(url + '?q={}'.format(q))
 
         if form.is_valid() and request.POST.get('issue_id') == None:
             data = form.cleaned_data
