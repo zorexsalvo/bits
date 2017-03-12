@@ -109,8 +109,11 @@ class Issue(models.Model):
         if not self.reference_id:
             Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
 
+        url = '/trackers/{}/issues/'.format(self.tracker.id)
+        if self.assigned_to.type == 'EMPLOYEE':
+            url += 'employee/'
+
         if self.assigned_to:
-            url = '/trackers/{}/issues/'.format(self.tracker.id)
             title = '{} assigned you in an issue.'.format(self.created_by)
 
             Notification.objects.create(user=self.assigned_to,
@@ -145,8 +148,11 @@ class Thread(models.Model):
 
         tags = []
 
+        url = '/trackers/{}/issues/'.format(self.issue.tracker.id)
+        if self.assigned_to.type == 'EMPLOYEE':
+            url += 'employee/'
+
         if not self.issue.created_by == self.created_by:
-            url = '/trackers/{}/issues/'.format(self.issue.tracker.id)
             title = '{} replied to your issue.'.format(self.created_by)
 
             Notification.objects.create(user=self.issue.created_by,
