@@ -14,29 +14,133 @@
         </aside>
 
         <div class="content-wrapper">
-            <section class="content-header">
-                <h1>
-                    Dashboard
-                    <small>Issue Tracking</small>
-                </h1>
-                <ol class="breadcrumb">
-                    <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a>
-                </ol>
-            </section>
-
             <section class="content">
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="box">
                             <div class="box-header with-border">
-                                <h3 class="box-title">Area Chart</h3>
-
+                                <h3 class="box-title">Issue Statistics</h3>
                             </div>
 
-                            <div class="box-body chart-responsive">
-                                <div class="chart" id="revenue-chart" style="height: 300px;"></div>
+                            <div class="box-body">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Priority</h3>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <a href="/archive/?status=LOW">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-aqua"><i class="fa fa-envelope-o"></i></span>
+
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">Low</span>
+                                        <span class="info-box-number">{{ statistics.low }}</span>
+                                        </div>
+                                        <!-- /.info-box-content -->
+                                    </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <a href="/archive/?status=NORMAL">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-green"><i class="fa fa-flag-o"></i></span>
+
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">Normal</span>
+                                        <span class="info-box-number">{{ statistics.normal }}</span>
+                                        </div>
+                                        <!-- /.info-box-content -->
+                                    </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <a href="/archive/?status=HIGH">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-orange"><i class="fa fa-star-o"></i></span>
+
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">High</span>
+                                        <span class="info-box-number">{{ statistics.high }}</span>
+                                        </div>
+                                        <!-- /.info-box-content -->
+                                    </div>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+
+                            <div class="box-body">
+
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Decision</h3>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="small-box bg-aqua">
+                                        <div class="inner">
+                                            <h3>{{ statistics.open }}</h3>
+
+                                            <p>Open</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-folder-open"></i>
+                                        </div>
+                                        <a href="/archive/?status=OPEN" class="small-box-footer">
+                                            More info <i class="fa fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <!-- /.info-box -->
+                                <div class="col-md-3">
+                                    <div class="small-box bg-green">
+                                        <div class="inner">
+                                            <h3>{{ statistics.sleep }}</h3>
+
+                                            <p>Sleep</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-bed"></i>
+                                        </div>
+                                        <a href="/archive/?status=SLEEP" class="small-box-footer">
+                                            More info <i class="fa fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="small-box bg-orange">
+                                        <div class="inner">
+                                            <h3>{{ statistics.closed }}</h3>
+
+                                            <p>Closed</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-check"></i>
+                                        </div>
+                                        <a href="/archive/?status=CLOSED" class="small-box-footer">
+                                            More info <i class="fa fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="small-box bg-red">
+                                        <div class="inner">
+                                            <h3>{{ statistics.dead }}</h3>
+
+                                            <p>Dead</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-close"></i>
+                                        </div>
+                                        <a href="/archive/?status=DEAD" class="small-box-footer">
+                                            More info <i class="fa fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
                     </div>
 
                 </div>

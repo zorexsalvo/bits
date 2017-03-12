@@ -505,19 +505,47 @@ class EmployeeView(HasRoleMixin, TemplateView):
     def get_notification(self, request):
         return Notification.objects.filter(user__username=request.user).order_by('-id')
 
+    def get_trackers(self, request):
+        user = User.objects.filter(username=request.user).first()
+        return Tracker.objects.filter(company=user.company)
+
     def get_context(self, request):
         context = {}
         context['user'] = self.get_user(request)
         context['notifications'] = self.get_notification(request)
         context['unread'] = context['notifications'].filter(read=False)
+        context['trackers'] = self.get_trackers(request)
         return context
 
 
 class DashboardView(EmployeeView):
     template_name = 'user/index.html'
 
+    def build_statistics(self, request):
+        statistics = OrderedDict()
+        user = User.objects.get(username=request.user)
+        issue = Issue.objects.filter(tracker__company=user.company)
+        open = issue.filter(decision='OPEN').count()
+        sleep = issue.filter(decision='SLEEP').count()
+        closed = issue.filter(decision='CLOSED').count()
+        dead = issue.filter(decision='DEAD').count()
+        low = issue.filter(priority='LOW').count()
+        normal = issue.filter(priority='NORMAL').count()
+        high = issue.filter(priority='HIGH').count()
+
+        statistics['open'] = open
+        statistics['sleep'] = sleep
+        statistics['closed'] = closed
+        statistics['dead'] = dead
+        statistics['low'] = low
+        statistics['normal'] = normal
+        statistics['high'] = high
+
+        return statistics
+
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
+        context['statistics'] = self.build_statistics(request)
         return render(request, self.template_name, context)
 
 
