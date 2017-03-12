@@ -514,27 +514,40 @@ class AdminDashboard(AdministratorView):
 class ArchiveView(AdministratorView):
     template_name = 'administrator/archive.html'
     form_class = DecisionForm
+    search_form_class = SearchForm
 
     def get(self, request, *args, **kwargs):
         status = request.GET.get('status')
+        q = request.GET.get('q')
         context = self.get_context(request)
+
+        issue = Issue.objects.filter(Q(decision=status) | Q(priority=status))
+        if q:
+            issue = issue.filter(Q(title__icontains=q) | Q(tracker__name__icontains=q) | Q(tracker__company__name__icontains=q))
+
         context['status'] = status
-        context['issues'] = Issue.objects.filter(Q(decision=status) | Q(priority=status))
+        context['issues'] = issue
         context['form'] = self.form_class()
+        context['search'] = self.search_form_class()
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        url = reverse('archive')
+        status = request.GET.get('status')
+
         form = self.form_class(request.POST or None)
+        search_form = self.search_form_class(request.POST or None)
+
+        if search_form.is_valid():
+            q = search_form.cleaned_data.get('q')
+            return HttpResponseRedirect(url + '?status={}&q={}'.format(status, q))
 
         if form.is_valid():
             data = form.cleaned_data
             issue = Issue.objects.get(id=data.get('issue_id'))
             issue.decision = data.get('decision')
             issue.save()
-            return HttpResponseRedirect('/dashboard/admin/')
-        print(form.errors)
-        return HttpResponseRedirect('/dashboard/admin/')
-
+            return HttpResponseRedirect(url + '?q={}'.format(status))
 
 
 # EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES
