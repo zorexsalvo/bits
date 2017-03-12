@@ -215,3 +215,6 @@ class DecisionForm(forms.Form):
 
         super(DecisionForm, self).__init__(*args, **kwargs)
         self.fields['decision'].choices = decision
+
+class SearchForm(forms.Form):
+    q = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control pull-right', 'name': 'table_search'}))

@@ -567,6 +567,7 @@ class DashboardView(EmployeeView):
 class IssueView(EmployeeView):
     template_name = 'user/issue.html'
     form_class = EmployeeRespondForm
+    search_form_class = SearchForm
 
     def build_thread_array(self, count):
         thread = []
@@ -574,9 +575,12 @@ class IssueView(EmployeeView):
             thread.append("")
         return thread
 
-    def get_issue_directory(self, tracker_id):
+    def get_issue_directory(self, tracker_id, q=None):
         issues_directory = {}
         issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+
+        if q:
+            issues = issues.filter(title__icontains=q)
 
         counter = 0
         for issue in issues:
@@ -602,8 +606,11 @@ class IssueView(EmployeeView):
 
         return OrderedDict(sorted(issues_directory.items()))
 
-    def get_issue(self, tracker_id):
-        return Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+    def get_issue(self, tracker_id, q=None):
+        issue = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
+        if q:
+            return issue.filter(title__icontains=q)
+        return issue
 
     def send_sms_notification(self, issue):
         issue = Issue.objects.filter(id=issue.id).first()
@@ -628,16 +635,24 @@ class IssueView(EmployeeView):
 
     def get(self, request, tracker_id, *args, **kwargs):
         form = self.form_class(tracker_id)
+        q = request.GET.get('q')
         context = self.get_context(request)
-        context['issues'] = self.get_issue(tracker_id)
-        context['issue_directory'] = self.get_issue_directory(tracker_id)
+        context['issues'] = self.get_issue(tracker_id, q)
+        context['issue_directory'] = self.get_issue_directory(tracker_id, q)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
         context['respond_form'] = form
+        context['search'] = self.search_form_class()
+
         return render(request, self.template_name, context)
 
     def post(self, request, tracker_id, *args, **kwargs):
         url = reverse('issue', kwargs={'tracker_id': tracker_id})
         form = self.form_class(tracker_id, request.POST or None)
+        search_form = self.search_form_class(request.POST or None)
+
+        if search_form.is_valid():
+            q = search_form.cleaned_data.get('q')
+            return HttpResponseRedirect(url + '?q={}'.format(q))
 
         if form.is_valid():
             data = form.cleaned_data
