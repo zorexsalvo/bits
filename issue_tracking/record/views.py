@@ -637,66 +637,16 @@ class IssueView(EmployeeView):
             return HttpResponseRedirect(url)
 
 
-class UserDirectoryView(EmployeeView):
-    template_name = 'user/user.html'
+class EmployeeArchiveView(EmployeeView):
+    template_name = 'user/archive.html'
 
     def get(self, request, *args, **kwargs):
+        status = request.GET.get('status')
         context = self.get_context(request)
-        context['users'] = User.objects.all()
-        return render(request, self.template_name, context)
-
-
-class CheckView(EmployeeView):
-    template_name = 'user/check.html'
-    form_class = CheckForm
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context(request)
-        context['form'] = self.form_class()
-        return render(request, self.template_name, context)
-
-    def post(self, request, *args, **kwargs):
-        context = self.get_context(request)
-        form = self.form_class(request.POST or None)
-
-        if form.is_valid():
-            context['record'] = Issue.objects.filter(reference_id__icontains=form.cleaned_data.get('keyword')).first()
-
-        context['form'] = self.form_class()
-        return render(request, self.template_name, context)
-
-
-class ThreadView(EmployeeView):
-    template_name = 'user/thread.html'
-    form_class = ThreadForm
-
-    def get_object(self, issue_id):
-        try:
-            return Issue.objects.get(id=issue_id)
-        except Issue.DoesNotExist:
-            None
-
-    def get(self, request, issue_id, *args, **kwargs):
-        context = self.get_context(request)
-        context['form'] = self.form_class()
-        context['issue'] = self.get_object(issue_id)
-        context['thread'] = Thread.objects.filter(issue__id=issue_id)
-        return render(request, self.template_name, context)
-
-    def post(self, request, issue_id, *args, **kwargs):
-        context = self.get_context(request)
-        form = self.form_class(request.POST or None)
-        context['form'] = form
-        context['issue'] = self.get_object(issue_id)
-        context['thread'] = Thread.objects.filter(issue__id=issue_id)
-
-        if form.is_valid():
-            data = form.cleaned_data
-            data['issue'] = Issue.objects.get(id=issue_id)
-            data['created_by'] = User.objects.get(username=request.user)
-            Thread.objects.create(**data)
-
-        context['form'] = self.form_class()
+        context['status'] = status
+        user = User.objects.get(username=request.user)
+        issue = Issue.objects.filter(tracker__company=user.company)
+        context['issues'] = issue.filter(Q(decision=status) | Q(priority=status))
         return render(request, self.template_name, context)
 
 

@@ -1,0 +1,87 @@
+{% extends 'user/base.html' %} {% load staticfiles %} {% block content %}
+{% load filters %}
+
+<body class="hold-transition skin-blue sidebar-mini fixed">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'user/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'user/navigation.html' with active_tab='dashboard' %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1><br/></h1>
+                <ol class="breadcrumb">
+                    <li><a href="/dashboard/"><i class="fa fa-map-marker"></i> Issue</a></li>
+                    <li class="active">{{ status }}</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                    <div class="row">
+
+                        <div class="col-xs-12">
+
+                            <div class="box">
+
+                                <div class="box-header">
+                                    <h3 class="box-title">
+                                    </h3>
+                                    <div class="box-tools">
+                                        <div class="input-group input-group-sm" style="width: 150px;">
+                                            <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+                                            <div class="input-group-btn">
+                                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <th>Issue Title</th>
+                                                <th>Assigned To</th>
+                                                <th>Priority</th>
+                                                <th>Created By</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for issue in issues %}
+                                            <tr>
+                                                <td>{{ issue.date_created }}</td>
+                                                <td>{{ issue }}</td>
+                                                <td>{{ issue.assigned_to }}</td>
+                                                <td>{{ issue.priority }}</td>
+                                                <td>{{ issue.created_by }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <td>No issues found.</td>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+        </div>
+
+    </div>
+
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
+
+    {% block js %}
+        {{ block.super }}
+    {% endblock js %}
+</body>
+{% endblock content %}

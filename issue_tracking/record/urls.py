@@ -17,9 +17,7 @@ urlpatterns = [
     url(r'dashboard/admin/$', login_required(AdminDashboard.as_view()), name='admin_dashboard'),
     url(r'archive/$', login_required(ArchiveView.as_view()), name='archive'),
     url(r'dashboard/$', login_required(DashboardView.as_view()), name='dashboard'),
-    url(r'^trackers/(?P<tracker_id>\d+)/issues/employee/$', login_required(IssueView.as_view()), name='issue'),
-    url(r'issue/(?P<issue_id>\d+)/thread/$', login_required(ThreadView.as_view()), name='thread'),
-    url(r'user/$', login_required(UserDirectoryView.as_view()), name='user_directory'),
-    url(r'check/$', login_required(CheckView.as_view()), name='check'),
+    url(r'trackers/(?P<tracker_id>\d+)/issues/employee/$', login_required(IssueView.as_view()), name='issue'),
+    url(r'archive/employee/$', login_required(EmployeeArchiveView.as_view()), name='archive_emloployee'),
     url(r'v1/notify_uri', SMSView.as_view(), name='notify_uri'),
 ]
