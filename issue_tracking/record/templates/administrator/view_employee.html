@@ -46,16 +46,25 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Employee</th>
-                                            <th>Company</th>
                                             <th>Position</th>
+                                            <th>SMS</th>
+                                            <th>Color</th>
                                             <th>Action</th>
                                         </tr>
                                         {% for employee in employees %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
                                             <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
-                                            <td>{{ employee.company }}</td>
                                             <td>{{ employee.position }}</td>
+                                            <td><input type="checkbox" {% if employee.access_token %}checked{% endif %} readonly></td>
+                                            <td>
+                                                <div style="float: left;
+                                                            width: 20px;
+                                                            height: 20px;
+                                                            margin: 5px;
+                                                            border: 1px solid rgba(0, 0, 0, .2);
+                                                            background-color: {{ employee.color }}"></div>
+                                            </td>
                                             <td>
                                                 <a class="btn btn-social btn-bitbucket" href="/employees/{{ employee.id }}/update/">
                                                     <i class="fa fa-edit"></i> Update
