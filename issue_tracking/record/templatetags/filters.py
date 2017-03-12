@@ -1,4 +1,5 @@
 from django import template
+from django.utils import timezone
 
 register = template.Library()
 
@@ -21,3 +22,7 @@ def getmessage(string):
         return string[:index]
     except:
         return ''
+
+@register.filter
+def converttotimestamp(date_created):
+    return timezone.localtime(date_created).strftime("%m-%d-%Y %H:%M:%S")

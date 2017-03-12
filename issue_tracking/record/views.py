@@ -485,13 +485,28 @@ class AdminDashboard(AdministratorView):
 
 class ArchiveView(AdministratorView):
     template_name = 'administrator/archive.html'
+    form_class = DecisionForm
 
     def get(self, request, *args, **kwargs):
         status = request.GET.get('status')
         context = self.get_context(request)
         context['status'] = status
         context['issues'] = Issue.objects.filter(Q(decision=status) | Q(priority=status))
+        context['form'] = self.form_class()
         return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST or None)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            issue.decision = data.get('decision')
+            issue.save()
+            return HttpResponseRedirect('/dashboard/admin/')
+        print(form.errors)
+        return HttpResponseRedirect('/dashboard/admin/')
+
 
 
 # EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES

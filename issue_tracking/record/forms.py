@@ -200,3 +200,18 @@ class ThreadForm(forms.ModelForm):
 
 class CheckForm(forms.Form):
     keyword = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Please input the Reference ID of the issue you want to check.', 'class': 'form-control'}))
+
+
+class DecisionForm(forms.Form):
+    issue_id = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}))
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': ''}))
+    decision = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        decision = (('OPEN', 'Open'),
+                    ('CLOSED', 'Closed'),
+                    ('SLEEP', 'Sleep'),
+                    ('DEAD', 'Dead'))
+
+        super(DecisionForm, self).__init__(*args, **kwargs)
+        self.fields['decision'].choices = decision
