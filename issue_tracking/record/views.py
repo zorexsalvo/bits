@@ -580,7 +580,7 @@ class IssueView(EmployeeView):
         issues = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
 
         if q:
-            issues = issues.filter(title__icontains=q)
+            issues = issues.filter(Q(title__icontains=q) | Q(reference_id__icontains=q) | Q(priority__icontains=q))
 
         counter = 0
         for issue in issues:
@@ -609,7 +609,7 @@ class IssueView(EmployeeView):
     def get_issue(self, tracker_id, q=None):
         issue = Issue.objects.filter(tracker__id=tracker_id).filter(decision='OPEN').order_by('-id')
         if q:
-            return issue.filter(title__icontains=q)
+            return issue.filter(Q(title__icontains=q) | Q(reference_id__icontains=q) | Q(priority__icontains=q))
         return issue
 
     def send_sms_notification(self, issue):
