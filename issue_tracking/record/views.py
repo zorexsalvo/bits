@@ -551,7 +551,7 @@ class DashboardView(EmployeeView):
 
 class IssueView(EmployeeView):
     template_name = 'user/issue.html'
-    form_class = IssueForm
+    form_class = EmployeeRespondForm
 
     def build_thread_array(self, count):
         thread = []
@@ -612,27 +612,29 @@ class IssueView(EmployeeView):
                 logging.error(f)
 
     def get(self, request, tracker_id, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(tracker_id)
         context = self.get_context(request)
         context['issues'] = self.get_issue(tracker_id)
         context['issue_directory'] = self.get_issue_directory(tracker_id)
         context['tracker'] = Tracker.objects.get(id=tracker_id)
-        context['form'] = form
+        context['respond_form'] = form
         return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST or None)
-        context = self.get_context(request)
-        context['form'] = form
+    def post(self, request, tracker_id, *args, **kwargs):
+        url = reverse('issue', kwargs={'tracker_id': tracker_id})
+        form = self.form_class(tracker_id, request.POST or None)
 
         if form.is_valid():
-            url = reverse('issue')
             data = form.cleaned_data
-            data['created_by'] = User.objects.get(username=request.user)
-            issue = Issue.objects.create(**data)
-            self.send_sms_notification(issue)
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            user = User.objects.get(id=data.get('assigned_to'))
+            thread = Thread(issue=issue,
+                            assigned_to=user,
+                            note=data.get('message'),
+                            callout=data.get('callout'),
+                            created_by=User.objects.get(username=request.user))
+            thread.save()
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, context)
 
 
 class UserDirectoryView(EmployeeView):

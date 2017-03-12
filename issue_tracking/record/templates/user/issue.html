@@ -98,18 +98,17 @@
 
         </div>
 
-<!-- IssueModal -->
-<div class="modal fade" id="issueModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="responseModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Create New Issue</h4>
+                <h4 class="modal-title" id="myModalLabel">Respond</h4>
             </div>
             <form method="POST">
                 {% csrf_token %}
                 <div class="modal-body">
-                    {{ form.as_p }}
+                    {{ respond_form.as_p }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -121,9 +120,6 @@
 </div>
 
 
-
-
-
     </div>
 
     {% block footer %}
@@ -132,9 +128,20 @@
 
     {% block js %}
         {{ block.super }}
-        <script type="text/javascript">
-            $(function () {
-                $(".select2").select2();
+        <script>
+            $('table').on('click', '.open-RespondDialog', function (e) {
+                var header = e.delegateTarget.tHead.rows[0].cells[this.cellIndex];
+                var issueId = $(header).data('id');
+                var issueTitle = $(header).data('title');
+                var assignedTo = $(header).data('assign');
+                var issueDescription = $(header).data('description');
+
+                $(".modal-body #title").val(issueTitle);
+                $(".modal-body #issue_id").val(issueId);
+                $(".modal-body #description").val(issueDescription);
+                $(".modal-body #assignedTo").val(assignedTo);
+
+                $('#responseModal').modal('show');
             });
         </script>
     {% endblock js %}
