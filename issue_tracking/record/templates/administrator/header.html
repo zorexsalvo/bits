@@ -1,0 +1,74 @@
+<a href="#" class="logo">
+    <span class="logo-mini"><b>B</b>IT</span>
+    <span class="logo-lg"><b>BIT</b></span>
+</a>
+
+<nav class="navbar navbar-static-top">
+    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+    </a>
+    <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+
+            <li class="dropdown notifications-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bell-o"></i>
+                    <span class="label label-warning">{% if unread.count > 0 %}{{ unread.count }}{% endif %}</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="header">You have {{ notifications.count }}
+                        {% if notifications.count > 1 %} notifications
+                        {% else %} notification
+                        {% endif %}.</li>
+                    <li>
+                        <ul class="menu">
+                            {% for notification in notifications %}
+                            <li>
+                                <a href="/notifications/{{ notification.id }}/" {% if notification.read == False %} style="background: #E7DFDD; text-decoration: none;"{% endif %}>
+                                    {% if notification.category == 'ISSUE' %}
+                                        <i class="fa fa-warning text-yellow"></i>
+                                    {% else %}
+                                        <i class="fa fa-comment-o text-green"></i>
+                                    {% endif %}
+                                    {{ notification.title }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                            
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    {% if user.picture.url %}
+                    <img src="{{ user.picture.url }}" class="user-image" alt="User Image">
+                    {% else %}
+                    <img src="/media/images/person.png" class="user-image" alt="User Image">
+                    {% endif %}
+                    <span class="hidden-xs">{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="user-header">
+                        {% if user.picture.url %}
+                        <img src="{{ user.picture.url }}" class="img-circle" alt="User Image">
+                        {% else %}
+                        <img src="/media/images/person.png" class="img-circle" alt="User Image">
+                        {% endif %}
+                        <p>
+                            {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }} - {{ user.position }}
+                        </p>
+                    </li>
+
+                    <li class="user-footer">
+                        <div class="pull-right">
+                            <a href="/logout/" class="btn btn-default btn-flat">Sign out</a>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</nav>

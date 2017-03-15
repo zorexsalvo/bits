@@ -1,0 +1,152 @@
+{% extends 'user/base.html' %} {% load filters %} {% block content %}
+
+<body class="hold-transition skin-blue sidebar-mini fixed">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'user/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'user/navigation.html' with active_tab='open_trackers' active_tracker=tracker %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1><br/></h1>
+                <ol class="breadcrumb">
+                    <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li class="active">View Issues</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                    <div class="row">
+
+                        <div class="col-xs-12">
+
+                            <div class="box">
+
+                                <div class="box-header">
+                                    <h3 class="box-title">
+                                    </h3>
+                                    <div class="box-tools">
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                        <div class="input-group input-group-sm" style="width: 150px;">
+                                            {{ search.q }}
+                                            <div class="input-group-btn">
+                                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                {% if issues %}
+                                                <th>Timestamp</th>
+                                                {% endif %}
+                                                {% for issue in issues %}
+                                                <th class="open-RespondDialog"
+                                                    data-id="{{ issue.id }}"
+                                                    data-title="{{ issue }}"
+                                                    data-assign="{{ issue.threads.last.assigned_to.id }}"
+                                                    data-description="{{ issue.description }}">
+                                                    Issue {{ issue.reference_id }}: {{ issue.title }} 
+                                                    {% if issue.priority %}
+                                                        {% if issue.priority == 'LOW' %}
+                                                            <span class="badge">
+                                                        {% elif issue.priority == 'NORMAL' %}
+                                                            <span class="badge bg-green">
+                                                        {% elif issue.priority == 'HIGH' %}
+                                                            <span class="badge bg-yellow">
+                                                        {% else %}
+                                                            <span class="badge bg-red">
+                                                        {% endif %}
+                                                            {{ issue.priority }}
+                                                        </span>
+                                                    {% endif %}
+                                                </th>
+                                                {% empty %}
+                                                <th>No issue found.</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if issues %}
+                                            {% for issue, comments in issue_directory.items %}
+                                            <tr>
+                                                <td>{{ issue }}</td>
+                                                {% for comment in comments %}
+                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog">{{ comment|getmessage }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td>No response found.</td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+        </div>
+
+<div class="modal fade" id="responseModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Respond</h4>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ respond_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
+
+    {% block js %}
+        {{ block.super }}
+        <script>
+            $('table').on('click', '.open-RespondDialog', function (e) {
+                var header = e.delegateTarget.tHead.rows[0].cells[this.cellIndex];
+                var issueId = $(header).data('id');
+                var issueTitle = $(header).data('title');
+                var assignedTo = $(header).data('assign');
+                var issueDescription = $(header).data('description');
+
+                $(".modal-body #title").val(issueTitle);
+                $(".modal-body #issue_id").val(issueId);
+                $(".modal-body #description").val(issueDescription);
+                $(".modal-body #assignedTo").val(assignedTo);
+
+                $('#responseModal').modal('show');
+            });
+        </script>
+    {% endblock js %}
+</body>
+{% endblock content %}

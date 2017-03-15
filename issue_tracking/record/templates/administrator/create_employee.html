@@ -1,0 +1,171 @@
+{% extends 'administrator/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+{{ block.super }}
+<title> BITS - Create Employee </title>
+{% endblock %}
+
+{% block content %}
+<body class="hold-transition skin-purple sidebar-mini fixed">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'administrator/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'administrator/navigation.html' with active_tab='create_employee' %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>
+                    Create Employee
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="/companies/create/"><i class="fa fa-dashboard"></i> Admin</a></li>
+                    <li class="active">Create Employee</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <i class="icon fa fa-{{ message.tags }}"></i>{{ message }}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        <div class="box">
+                            <form role="form" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="box-body">
+                                    <div class="box box-solid">
+                                        <div class="box-header with-border">
+                                        <h4 class="box-title">Account Details</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label>Username</label>
+                                                {{ form.username }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Password</label>
+                                                {{ form.password }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>User Type</label>
+                                                {{ form.type }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="box box-solid">
+                                        <div class="box-header with-border">
+                                        <h4 class="box-title">Personal Details</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label>First Name</label>
+                                                {{ form.first_name }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Middle Name</label>
+                                                {{ form.middle_name }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Last Name</label>
+                                                {{ form.last_name }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Sex</label>
+                                                {{ form.sex }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Date of Birth</label>
+                                                <div class="input-group date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                    {{ form.date_of_birth }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Mobile Number</label>
+                                                <div class="input-group date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-mobile"></i>
+                                                </div>
+                                                    {{ form.mobile_number }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Photo</label>
+                                                {{ form.picture }}
+                                            </div>
+                                                {{ form.color }}
+                                        </div>
+                                    </div>
+
+                                    <div class="box box-solid">
+                                        <div class="box-header with-border">
+                                        <h4 class="box-title">Employement Details</h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label>Company</label>
+                                                {{ form.company }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Position</label>
+                                                {{ form.position }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                          <!-- /.box-body -->
+
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+
+
+    </div>
+{% block footer %}
+{{ block.super }}
+{% endblock footer %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script>
+    //Date picker
+    $('#datepicker').datepicker({
+      autoclose: true
+    });
+</script>
+<script>
+    $('#id_color').paletteColorPicker({
+        clear_btn: 'last'
+    });
+</script>
+{% endblock js %}
+</body>
+{% endblock content %}

@@ -1,0 +1,100 @@
+<section class="sidebar">
+    <div class="user-panel">
+        <div class="pull-left image">
+            {% if user.picture.url %}
+            <img src="{{ user.picture.url }}" class="img-circle" alt="User Image" style="width:50px; height:50px;">
+            {% else %}
+            <img src="/media/images/person.png" class="img-circle" alt="User Image">
+            {% endif %}
+        </div>
+        <div class="pull-left info">
+            <p>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</p>
+            <a href="#">{{ user.company }}</a>
+        </div>
+    </div>
+
+    <form action="#" method="get" class="sidebar-form">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+            </span>
+        </div>
+    </form>
+
+    <ul class="sidebar-menu">
+        <li class="{% if active_tab == 'dashboard' %}active{% endif %}"><a href="/dashboard/admin/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+
+        <li class="header">COMPANY</li>
+
+        <li class="{% if active_tab == 'create_company' %}active{% endif %}"><a href="/companies/create/"><i class="fa fa-edit"></i> <span>Create Company</span></a></li>
+
+        <li class="treeview {% if active_tab == 'open_companies' %}active{% endif %}">
+            <a href="#">
+                <i class="fa fa-share"></i> <span>Open Companies</span>
+                <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                {% if companies %}
+                {% for company in companies %}
+                <li class="treeview {% if company.id == tracker.company.id %}active{% endif %} {% if company.id == active_company.id %}active{% endif %}">
+                    <a href="#">
+                        <i class="fa fa-building"></i> <span>{{ company }}</span>
+                        <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{% if company.id == active_company.id %}active{% endif %}"><a href="/companies/{{ company.id }}/trackers/create/"><i class="fa fa-plus-square"></i> Create Tracker</a></li>
+                        <li class="treeview {% if active_tracker %}active{% endif %}">
+                            <a href="#">
+                                <i class="fa fa-wifi"></i> <span>Open Trackers</span>
+                                <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                {% for tracker in company.trackers.all %}
+                                <li class="{% if tracker.id == active_tracker.id %}active{% endif %}"><a href="/trackers/{{ tracker.id }}/issues/"><i class="fa fa-map-marker"></i>{{ tracker }}</a></li>
+                                {% empty %}
+                                <li><a href="#">No trackers found.</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                {% endfor %}
+                {% else %}
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-building"></i> <span>No companies found.</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
+
+        <li class="header">EMPLOYEE</li>
+        <li class="{% if active_tab == 'create_employee' %}active{% endif %}"><a href="/employees/create/"><i class="fa fa-edit"></i> <span>Create Employee</span></a></li>
+
+        <li class="treeview {% if active_tab == 'employee' %}active{% endif %}">
+            <a href="#">
+                <i class="fa fa-table"></i> <span>View Employees</span>
+                <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                {% for company in companies %}
+                <li class="{% if company.id == active_company_employee.id %}active{% endif %}"><a href="/companies/{{ company.id }}/employees/"><i class="fa fa-building"></i>{{ company }}</a></li>
+                {% empty %}
+                <li><a href="#">No company found.</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+
+    </ul>
+</section>

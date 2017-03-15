@@ -1,0 +1,68 @@
+{% extends 'administrator/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<body class="hold-transition skin-purple sidebar-mini fixed">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'administrator/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'administrator/navigation.html' with active_tab='open_companies' active_company=company %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>
+                    Create Tracker
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-building"></i> {{ company.name }}</a></li>
+                </ol>
+            </section>
+
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <i class="icon fa fa-{% if message.tags == 'success' %}check{% else %}{{ message.tags }}{% endif %}"></i> {{ message }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="box">
+
+                            <form role="form" method="POST">
+                                {% csrf_token %}
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        {{ form.as_p }}
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
+
+    {% block js %}
+        {{ block.super }}
+    {% endblock js %}
+</body>
+{% endblock content %}

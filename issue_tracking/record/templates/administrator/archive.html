@@ -1,0 +1,127 @@
+{% extends 'administrator/base.html' %} {% load staticfiles %} {% block content %}
+{% load filters %}
+
+<body class="hold-transition skin-purple sidebar-mini fixed">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'administrator/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'administrator/navigation.html' with active_tab='dashboard' %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1><br/></h1>
+                <ol class="breadcrumb">
+                    <li><a href="/dashboard/"><i class="fa fa-map-marker"></i> Issue</a></li>
+                    <li class="active">{{ status }}</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                    <div class="row">
+
+                        <div class="col-xs-12">
+
+                            <div class="box">
+
+                                <div class="box-header">
+                                    <h3 class="box-title">
+                                    </h3>
+                                    <div class="box-tools">
+                                        <form method="POST">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm" style="width: 150px;">
+                                            {{ search.q }}
+                                            <div class="input-group-btn">
+                                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <th>Issue Title</th>
+                                                <th>Company</th>
+                                                <th>Tracker</th>
+                                                <th>Priority</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for issue in issues %}
+                                            <tr class="open-decisionDialog"
+                                                data-id="{{ issue.id }}"
+                                                data-title="{{ issue }}"
+                                                data-decision="{{ issue.decision }}">
+                                                <td>{{ issue.date_created|converttotimestamp }}</td>
+                                                <td>{{ issue }}</td>
+                                                <td>{{ issue.tracker.company }}</td>
+                                                <td>{{ issue.tracker }}</td>
+                                                <td>{{ issue.priority }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <td>No issues found.</td>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="decisionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Change Decision</h4>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
+
+    {% block js %}
+        {{ block.super }}
+        <script>
+            $('table').on('click', '.open-decisionDialog', function() {
+                var issueId = $(this).data('id');
+                var decision = $(this).data('decision');
+                var title = $(this).data('title');
+
+                $(".modal-body #id_title").val(title);
+                $(".modal-body #id_issue_id").val(issueId);
+                $(".modal-body #id_decision").val(decision);
+
+                $("#decisionModal").modal('show');
+            });
+        </script>
+    {% endblock js %}
+</body>
+{% endblock content %}

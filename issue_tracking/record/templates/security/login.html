@@ -1,0 +1,65 @@
+{% extends 'security/base.html' %} {% block content %}
+
+<body class="hold-transition lockscreen">
+
+    <div class="lockscreen-wrapper">
+
+        <div class="lockscreen-logo">
+            <img src="/media/images/bits.logo.png" alt="Logo Image" style="width:150">
+        </div>
+
+        {% if user.first_name %}
+            <div class="lockscreen-name">{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</div>
+        {% endif %}
+
+        <div class="lockscreen-item">
+            <div class="lockscreen-image">
+                {% if user.picture %}
+                    <img src="{{ user.picture.url }}" alt="User Image">
+                {% else %}
+                    <img src="/media/images/person.png" alt="User Image">
+                {% endif %}
+            </div>
+
+            {% if form %}
+            <form class="lockscreen-credentials" method="POST">
+            {% csrf_token %}
+                <div class="input-group">
+                    {{ form.username.as_hidden }}
+                    {{ form.password }}
+                    <div class="input-group-btn">
+                        <button type="submit" class="btn shake"><i class="fa fa-arrow-right text-muted"></i></button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+
+        </div>
+
+    <div class="text-center">
+        <a href="/login/user/">Or sign in as a different user</a>
+    </div>
+
+    <div class="lockscreen-footer text-center">
+       <strong>Copyright &copy; 2016-2017 <a href="#">BITS Device</a>.</strong><br/>All rights reserved.
+       Developed by <strong><a href="#">BITS Team</a></strong>.
+    </div>
+
+    </div>
+
+{% block js %}
+    {{ block.super }}
+    {% if form.errors %}
+    <script>
+        $(document).ready(function(){
+            $(".shake").effect( "shake", {times:3}, 500);
+        });
+    </script>
+    {% endif %}
+{% endblock js %}
+
+</body>
+
+{% endblock content %}
+
+</html>

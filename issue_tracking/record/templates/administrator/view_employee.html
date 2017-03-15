@@ -1,0 +1,129 @@
+{% extends 'administrator/base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <body class="hold-transition skin-purple sidebar-mini fixed">
+        <div class="wrapper">
+
+            <header class="main-header">
+                {% include 'administrator/header.html' %}
+            </header>
+
+            <aside class="main-sidebar">
+                {% include 'administrator/navigation.html' with active_tab='employee' active_company_employee=company %}
+            </aside>
+
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <h1><br/></h1>
+                    <ol class="breadcrumb">
+                        <li><a href="/companies/create/"><i class="fa fa-dashboard"></i> Admin</a></li>
+                        <li class="active">View Employees</li>
+                    </ol>
+                </section>
+
+                <section class="content">
+                    <div class="row">
+
+                        <div class="col-xs-12">
+
+                            <div class="box">
+
+                                <div class="box-header">
+                                    <h3 class="box-title">Employee Directory</h3>
+                                    <div class="box-tools">
+                                        <form method="POST">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm" style="width: 150px;">
+                                            {{ search.q }}
+                                            <div class="input-group-btn">
+                                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="box-body table-responsive table-bordered no-padding">
+                                    <table class="table table-hover">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Employee</th>
+                                            <th>Position</th>
+                                            <th>SMS</th>
+                                            <th>Color</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        {% for employee in employees %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
+                                            <td>{{ employee.position }}</td>
+                                            <td><input type="checkbox" {% if employee.access_token %}checked{% endif %} readonly></td>
+                                            <td>
+                                                <div style="float: left;
+                                                            width: 20px;
+                                                            height: 20px;
+                                                            margin: 5px;
+                                                            border: 1px solid rgba(0, 0, 0, .2);
+                                                            background-color: {{ employee.color }}"></div>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-social btn-bitbucket" href="/employees/{{ employee.id }}/update/">
+                                                    <i class="fa fa-edit"></i> Update
+                                                </a>
+
+                                                <a class="btn btn-social bg-maroon open-Dialog" data-id="{{ employee.id }}" data-company-id="{{ employee.company.id }}">
+                                                    <i class="fa fa-trash-o"></i> Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr><td>No employees found.</td></tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Confirmation Dialog</h4>
+                        </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this employee?
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-default" data-dismiss="modal">Close</a>
+                                <a id="delete" class="btn bg-maroon" href="">Delete</a>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        {% block footer %}
+            {{ block.super }}
+        {% endblock footer %}
+
+        {% block js %}
+            {{ block.super }}
+            <script>
+                $("a.open-Dialog").click(function() {
+                    var employee_id = $(this).data("id")
+                    var company_id = $(".open-Dialog").data("company-id");
+                    $("#confirmationModal").modal("show");
+                    $("#delete").prop("href", "/employees/" + employee_id + "/delete/?company_id=" + company_id);
+                });
+            </script>
+        {% endblock js %}
+
+    </body>
+{% endblock content %}
