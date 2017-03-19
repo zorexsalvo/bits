@@ -29,6 +29,6 @@ def converttotimestamp(date_created):
 
 @register.filter
 def minimizestring(string):
-    if string:
-        return '{}...'.format(string[:20])
+    if string and len(string) >= 25:
+        return '{} ...'.format(string[:25])
     return string
