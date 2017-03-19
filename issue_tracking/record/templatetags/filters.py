@@ -26,3 +26,9 @@ def getmessage(string):
 @register.filter
 def converttotimestamp(date_created):
     return timezone.localtime(date_created).strftime("%m-%d-%Y %H:%M:%S")
+
+@register.filter
+def minimizestring(string):
+    if string:
+        return '{}...'.format(string[:20])
+    return string

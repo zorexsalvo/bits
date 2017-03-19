@@ -110,17 +110,19 @@ class Issue(models.Model):
             Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
 
         url = '/trackers/{}/issues/'.format(self.tracker.id)
-        if self.assigned_to.type == 'EMPLOYEE':
-            url += 'employee/'
 
         if self.assigned_to:
-            title = '{} assigned you in an issue.'.format(self.created_by)
+            if self.assigned_to.type == 'EMPLOYEE':
+                url += 'employee/'
 
-            Notification.objects.create(user=self.assigned_to,
-                                        category='ISSUE',
-                                        title=title,
-                                        url=url,
-                                        read=False)
+            if self.assigned_to:
+                title = '{} assigned you in an issue.'.format(self.created_by)
+
+                Notification.objects.create(user=self.assigned_to,
+                                            category='ISSUE',
+                                            title=title,
+                                            url=url,
+                                            read=False)
 
 
 class Thread(models.Model):
