@@ -82,8 +82,7 @@
                                             <tr>
                                                 <td>{{ issue }}</td>
                                                 {% for comment in comments %}
-                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog">{{ comment|getmessage }}</td>
-                                                {% endfor %}
+                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog" data-toggle="tooltip" title="{{ comment|getmessage }}">{{ comment|getmessage|minimizestring }}</td>                                                {% endfor %}
                                             </tr>
                                             {% empty %}
                                             <tr>
@@ -145,6 +144,11 @@
                 $(".modal-body #assignedTo").val(assignedTo);
 
                 $('#responseModal').modal('show');
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('[data-toggle="tooltip"]').tooltip();
             });
         </script>
     {% endblock js %}
