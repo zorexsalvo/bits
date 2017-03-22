@@ -1,3 +1,6 @@
 #datepicker {
     background-color: white;
 }
+div.tooltip {
+    word-wrap: break-word;
+}
