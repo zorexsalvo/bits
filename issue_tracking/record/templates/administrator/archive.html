@@ -96,6 +96,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="progressButton" class="btn btn-success">View Progress</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
@@ -121,6 +122,13 @@
 
                 $("#decisionModal").modal('show');
             });
+        </script>
+        <script>
+            document.getElementById("progressButton").onclick = function(event) {
+                event.preventDefault();
+                var issue_id = document.getElementById("id_issue_id");
+                window.location = "/issues/" + issue_id.value;
+            };
         </script>
     {% endblock js %}
 </body>

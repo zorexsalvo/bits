@@ -550,6 +550,97 @@ class ArchiveView(AdministratorView):
             return HttpResponseRedirect(url + '?q={}'.format(status))
 
 
+class AdminThreadView(AdministratorView):
+    template_name = 'administrator/thread.html'
+    form_class = IssueForm
+    respond_form_class = RespondForm
+    assign_form_class = AssignForm
+
+    def build_thread_array(self, count):
+        thread = []
+        for x in range(count):
+            thread.append("")
+        return thread
+
+    def get_issue_directory(self, issue_id):
+        issues_directory = {}
+        issues = Issue.objects.filter(id=issue_id)
+
+        counter = 0
+        for issue in issues:
+            timestamp = timezone.localtime(issue.date_created).strftime("%m-%d-%Y %H:%M:%S")
+            if timestamp not in issues_directory:
+                thread = self.build_thread_array(issues.count())
+                if issue.description:
+                    thread[counter] = issue.description + "|" + issue.assigned_to.color
+                    issues_directory[timestamp] = thread
+            else:
+                if issue.description:
+                    issues_directory[timestamp][counter] = issue.description
+
+            for note in issue.threads.all():
+                timestamp = timezone.localtime(note.date_created).strftime("%m-%d-%Y %H:%M:%S")
+                if timestamp not in issues_directory:
+                    thread = self.build_thread_array(issues.count())
+                    thread[counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
+                    issues_directory[timestamp] = thread
+                else:
+                    issues_directory[timestamp][counter] = note.callout + " - " + note.note + "|" + note.assigned_to.color
+            counter += 1
+
+        return OrderedDict(sorted(issues_directory.items()))
+
+    def get(self, request, issue_id, *args, **kwargs):
+        context = self.get_context(request)
+        issue = Issue.objects.get(id=issue_id)
+        form = self.form_class()
+        respond_form = self.respond_form_class(issue.tracker.id)
+        assign_form = self.assign_form_class(issue.tracker.id)
+
+        context['issues'] = Issue.objects.filter(id=issue_id)
+        context['issue_directory'] = self.get_issue_directory(issue_id)
+
+        context['form'] = form
+        context['respond_form'] = respond_form
+        context['assign_form'] = assign_form
+        return render(request, self.template_name, context)
+
+    def post(self, request, issue_id, *args, **kwargs):
+        url = reverse('admin_issue_thread', kwargs={'issue_id':issue_id})
+        issue = Issue.objects.get(id=issue_id)
+
+        assign_form = self.assign_form_class(issue.tracker.id, request.POST or None)
+        respond_form = self.respond_form_class(issue.tracker.id, request.POST or None)
+
+        context = self.get_context(request)
+
+        if respond_form.is_valid():
+            data = respond_form.cleaned_data
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            user = User.objects.get(id=data.get('assigned_to'))
+            issue.decision = data.get('decision')
+            issue.save()
+            thread = Thread(issue=issue,
+                            assigned_to=user,
+                            note=data.get('message'),
+                            callout=data.get('callout'),
+                            created_by=User.objects.get(username=request.user))
+            thread.save()
+            return HttpResponseRedirect(url)
+
+        if assign_form.is_valid():
+            data = assign_form.cleaned_data
+            user = User.objects.get(id=data.get('assigned_to'))
+            issue = Issue.objects.get(id=data.get('issue_id'))
+            issue.priority = data.get('priority')
+            issue.assigned_to = user
+            issue.description = data.get('description')
+            issue.date_created = timezone.now()
+            issue.save()
+            return HttpResponseRedirect(url)
+
+        return render(request, self.template_name, context)
+
 # EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES
 
 class EmployeeView(HasRoleMixin, TemplateView):
