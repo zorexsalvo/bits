@@ -1,9 +1,6 @@
 #datepicker {
     background-color: white;
 }
-div.tooltip {
-    word-wrap: break-word;
-}
 .lockscreen {
     background-image: url('/static/img/bg.jpg');
     background-size: cover;
