@@ -546,8 +546,9 @@ class ArchiveView(AdministratorView):
             data = form.cleaned_data
             issue = Issue.objects.get(id=data.get('issue_id'))
             issue.decision = data.get('decision')
+            issue.priority = data.get('priority')
             issue.save()
-            return HttpResponseRedirect(url + '?q={}'.format(status))
+            return HttpResponseRedirect(url + '?status={}'.format(status))
 
 
 class AdminThreadView(AdministratorView):

@@ -206,15 +206,20 @@ class DecisionForm(forms.Form):
     issue_id = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}))
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': ''}))
     decision = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+    priority = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         decision = (('OPEN', 'Open'),
                     ('CLOSED', 'Closed'),
                     ('SLEEP', 'Sleep'),
                     ('DEAD', 'Dead'))
+        priority = (('LOW', 'Low'),
+                    ('NORMAL', 'Normal'),
+                    ('HIGH', 'High'))
 
         super(DecisionForm, self).__init__(*args, **kwargs)
         self.fields['decision'].choices = decision
+        self.fields['priority'].choices = priority
 
 class SearchForm(forms.Form):
     q = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control pull-right', 'name': 'table_search'}))

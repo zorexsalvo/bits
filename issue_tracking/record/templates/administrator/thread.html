@@ -9,7 +9,7 @@
         </header>
 
         <aside class="main-sidebar">
-            {% include 'administrator/navigation.html' with active_tab='open_companies' active_tracker=tracker %}
+            {% include 'administrator/navigation.html' with active_tab='dashboard' active_tracker=tracker %}
         </aside>
 
         <div class="content-wrapper">
@@ -67,7 +67,7 @@
                                             <tr>
                                                 <td>{{ issue }}</td>
                                                 {% for comment in comments %}
-                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog" data-toggle="tooltip" title="{{ comment|getmessage }}">{{ comment|getmessage|minimizestring }}</td>
+                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog" data-toggle="tooltip" data-container="body" title="{{ comment|getmessage }}">{{ comment|getmessage|minimizestring }}</td>
                                                 {% endfor %}
                                             </tr>
                                             {% empty %}
