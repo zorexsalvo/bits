@@ -840,11 +840,15 @@ class SMSView(View):
         access_token = self.request.GET.get('access_token')
         subscriber_number = self.request.GET.get('subscriber_number')
 
+        print(self.request.GET)
+
         User.objects.filter(mobile_number__endswith=subscriber_number).update(access_token=access_token)
         return HttpResponse()
 
     def post(self, request, *args, **kwargs):
         unsubscribed = json.loads(self.request.body).get('unsubscribed')
+
+        print(self.request.body)
 
         User.objects.filter(mobile_number__endswith=unsubscribed.get('subscriber_number')).update(access_token=None)
         return HttpResponse()
