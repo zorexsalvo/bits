@@ -258,7 +258,7 @@ class CreateEmployee(AdministratorView):
             messages.success(request, 'Text INFO to {} (Cross-telco: {}) to subscribe to SMS Notification.'.format(short_code, cross_telco))
             return HttpResponseRedirect(url)
         else:
-            messages.warning(request, 'User already exists.')
+            messages.warning(request, form.errors.values()[0][0])
             return HttpResponseRedirect(url)
         return render(request, self.template_name, context)
 
