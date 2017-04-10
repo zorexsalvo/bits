@@ -71,12 +71,17 @@ class UserForm(forms.Form):
     type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=TYPE)
 
     def clean(self):
+        if User.objects.filter(company=self.cleaned_data['company']).filter(color=self.cleaned_data['color']):
+            raise forms.ValidationError('Color already in use.')
+
         if AuthUser.objects.filter(username=self.cleaned_data['username']):
             raise forms.ValidationError('Username already taken.')
+
         if User.objects.filter(first_name=self.cleaned_data['first_name']) \
                        .filter(middle_name=self.cleaned_data['middle_name']) \
                        .filter(last_name=self.cleaned_data['last_name']):
             raise forms.ValidationError('User already exists.')
+
         return self.cleaned_data
 
 
