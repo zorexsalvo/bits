@@ -428,6 +428,7 @@ class AdminIssueView(AdministratorView):
             issue.description = data.get('description')
             issue.date_created = timezone.now()
             issue.save()
+            self.send_sms_notification(issue)
             return HttpResponseRedirect(url)
 
         return render(request, self.template_name, context)
