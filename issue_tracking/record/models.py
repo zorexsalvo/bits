@@ -7,11 +7,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from issue_tracker.roles import Administrator, Employee
+from issue_tracker.config import sys_config
 
 from colorfield.fields import ColorField
 
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
+GLOBE_LABS_CONFIG_SECTION = 'GlobeLabs'
 
 
 class Company(models.Model):
@@ -145,8 +147,28 @@ class Thread(models.Model):
     def __unicode__(self):
         return str(self.issue)
 
+   def send_sms_notification(self, thread):
+        sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+
+        sms_notification = '{created_by} assigned you in an issue. {reference_id} - {title}'
+
+        if sms_notification is not None:
+            sms_payload = {
+                'address': thread.issue.assigned_to.mobile_number,
+                'message': sms_notification.format(reference_id=thread.issue.reference_id, title=thread.issue.title, created_by=thread.created_by)
+            }
+
+            try:
+                response = requests.post(sms_uri, data=sms_payload)
+                logging.info(response.text)
+            except requests.exceptions.ProxyError as e:
+                logging.error(e)
+            except requests.exceptions.ConnectionError as f:
+                logging.error(f)
+
     def save(self, *args, **kwargs):
-        super(Thread, self).save(*args, **kwargs)
+        thread = super(Thread, self).save(*args, **kwargs)
 
         tags = []
 
@@ -176,6 +198,9 @@ class Thread(models.Model):
                                                     title=title,
                                                     url=url,
                                                     read=False)
+
+       if not self.created_by == self.issue.assigned_to:
+           self.send_sms_notification(thread)
 
 
 class SmsNotification(models.Model):
