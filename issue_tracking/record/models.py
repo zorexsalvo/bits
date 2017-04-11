@@ -11,6 +11,9 @@ from issue_tracker.config import sys_config
 
 from colorfield.fields import ColorField
 
+import requests
+import logging
+
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
 GLOBE_LABS_CONFIG_SECTION = 'GlobeLabs'
@@ -149,7 +152,7 @@ class Thread(models.Model):
 
     def send_sms_notification(self, thread):
         sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
-        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=issue.assigned_to.access_token)
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=thread.issue.assigned_to.access_token)
 
         sms_notification = '{created_by} assigned you in an issue. {reference_id} - {title}'
 
@@ -168,7 +171,8 @@ class Thread(models.Model):
                 logging.error(f)
 
     def save(self, *args, **kwargs):
-        thread = super(Thread, self).save(*args, **kwargs)
+        super(Thread, self).save(*args, **kwargs)
+        thread = Thread.objects.get(id=self.id)
 
         tags = []
 
