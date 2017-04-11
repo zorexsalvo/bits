@@ -199,8 +199,8 @@ class Thread(models.Model):
                                                     url=url,
                                                     read=False)
 
-       if not self.created_by == self.issue.assigned_to:
-           self.send_sms_notification(thread)
+        if not self.created_by == self.issue.assigned_to:
+            self.send_sms_notification(thread)
 
 
 class SmsNotification(models.Model):
