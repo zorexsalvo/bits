@@ -154,12 +154,12 @@ class Thread(models.Model):
         sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
         sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=thread.issue.assigned_to.access_token)
 
-        sms_notification = '{created_by} assigned you in Issue {reference_id} - {title}.'
+        sms_notification = '{created_by} assigned you in Issue {reference_id} - {title}.\n{response}'
 
         if sms_notification is not None:
             sms_payload = {
                 'address': thread.issue.assigned_to.mobile_number,
-                'message': sms_notification.format(reference_id=thread.issue.reference_id, title=thread.issue.title, created_by=thread.created_by)
+                'message': sms_notification.format(reference_id=thread.issue.reference_id, title=thread.issue.title, created_by=thread.created_by, response=thread.note)
             }
 
             try:
