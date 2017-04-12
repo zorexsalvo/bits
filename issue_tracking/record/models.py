@@ -158,7 +158,7 @@ class Thread(models.Model):
 
         if sms_notification is not None:
             sms_payload = {
-                'address': thread.issue.assigned_to.mobile_number,
+                'address': thread.assigned_to.mobile_number,
                 'message': sms_notification.format(reference_id=thread.issue.reference_id, title=thread.issue.title, created_by=thread.created_by, response=thread.note)
             }
 
