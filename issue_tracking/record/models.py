@@ -152,7 +152,7 @@ class Thread(models.Model):
 
     def send_sms_notification(self, thread):
         sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
-        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=thread.issue.assigned_to.access_token)
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=thread.assigned_to.access_token)
 
         sms_notification = '{created_by} assigned you in Issue {reference_id} - {title}.\n\nDescription:\n{response}'
 
