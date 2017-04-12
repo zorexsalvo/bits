@@ -71,12 +71,17 @@ class UserForm(forms.Form):
     type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices=TYPE)
 
     def clean(self):
+        if User.objects.filter(company=self.cleaned_data['company']).filter(color=self.cleaned_data['color']):
+            raise forms.ValidationError('Color already in use.')
+
         if AuthUser.objects.filter(username=self.cleaned_data['username']):
             raise forms.ValidationError('Username already taken.')
+
         if User.objects.filter(first_name=self.cleaned_data['first_name']) \
                        .filter(middle_name=self.cleaned_data['middle_name']) \
                        .filter(last_name=self.cleaned_data['last_name']):
             raise forms.ValidationError('User already exists.')
+
         return self.cleaned_data
 
 
@@ -206,15 +211,20 @@ class DecisionForm(forms.Form):
     issue_id = forms.CharField(widget=forms.HiddenInput(attrs={'class': 'form-control'}))
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': ''}))
     decision = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+    priority = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         decision = (('OPEN', 'Open'),
                     ('CLOSED', 'Closed'),
                     ('SLEEP', 'Sleep'),
                     ('DEAD', 'Dead'))
+        priority = (('LOW', 'Low'),
+                    ('NORMAL', 'Normal'),
+                    ('HIGH', 'High'))
 
         super(DecisionForm, self).__init__(*args, **kwargs)
         self.fields['decision'].choices = decision
+        self.fields['priority'].choices = priority
 
 class SearchForm(forms.Form):
     q = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control pull-right', 'name': 'table_search'}))

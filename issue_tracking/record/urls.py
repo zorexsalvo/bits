@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'companies/create/$', login_required(CreateCompany.as_view()), name='create_company'),
     url(r'companies/(?P<company_id>\d+)/trackers/create/$', login_required(CreateTracker.as_view()), name='create_tracker'),
     url(r'trackers/(?P<tracker_id>\d+)/issues/$', login_required(AdminIssueView.as_view()), name='admin_tracker_issue'),
+    url(r'issues/(?P<issue_id>\d+)/$', login_required(AdminThreadView.as_view()), name='admin_issue_thread'),
     url(r'companies/(?P<company_id>\d+)/employees/$', login_required(ViewEmployee.as_view()), name='view_employee'),
     url(r'employees/create/$', login_required(CreateEmployee.as_view()), name='create_employee'),
     url(r'employees/(?P<employee_id>\d+)/update/$', login_required(UpdateEmployee.as_view()), name='update_employee'),

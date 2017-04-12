@@ -7,11 +7,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from issue_tracker.roles import Administrator, Employee
+from issue_tracker.config import sys_config
 
 from colorfield.fields import ColorField
 
+import requests
+import logging
+
 PHONE_REGEX = RegexValidator(regex=r'^\b(09)\d{9}?\b$', message='Phone number must be entered in the format: 09XXXXXXXXXX.')
 NAME_REGEX = RegexValidator(regex=r'^[a-zA-Z\xd1\xf1\s.-]*$', message='Invalid input.')
+GLOBE_LABS_CONFIG_SECTION = 'GlobeLabs'
 
 
 class Company(models.Model):
@@ -110,17 +115,19 @@ class Issue(models.Model):
             Issue.objects.filter(id=self.id).update(reference_id='#{0:04d}'.format(count))
 
         url = '/trackers/{}/issues/'.format(self.tracker.id)
-        if self.assigned_to.type == 'EMPLOYEE':
-            url += 'employee/'
 
         if self.assigned_to:
-            title = '{} assigned you in an issue.'.format(self.created_by)
+            if self.assigned_to.type == 'EMPLOYEE':
+                url += 'employee/'
 
-            Notification.objects.create(user=self.assigned_to,
-                                        category='ISSUE',
-                                        title=title,
-                                        url=url,
-                                        read=False)
+            if self.assigned_to:
+                title = '{} assigned you in an issue.'.format(self.created_by)
+
+                Notification.objects.create(user=self.assigned_to,
+                                            category='ISSUE',
+                                            title=title,
+                                            url=url,
+                                            read=False)
 
 
 class Thread(models.Model):
@@ -143,8 +150,29 @@ class Thread(models.Model):
     def __unicode__(self):
         return str(self.issue)
 
+    def send_sms_notification(self, thread):
+        sender_address = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'short_code')
+        sms_uri = sys_config.get(GLOBE_LABS_CONFIG_SECTION, 'sms_uri').format(senderAddress=sender_address, access_token=thread.assigned_to.access_token)
+
+        sms_notification = '{created_by} assigned you in Issue {reference_id} - {title}.\n\nDescription:\n{response}'
+
+        if sms_notification is not None:
+            sms_payload = {
+                'address': thread.assigned_to.mobile_number,
+                'message': sms_notification.format(reference_id=thread.issue.reference_id, title=thread.issue.title, created_by=thread.created_by, response=thread.note)
+            }
+
+            try:
+                response = requests.post(sms_uri, data=sms_payload)
+                logging.info(response.text)
+            except requests.exceptions.ProxyError as e:
+                logging.error(e)
+            except requests.exceptions.ConnectionError as f:
+                logging.error(f)
+
     def save(self, *args, **kwargs):
         super(Thread, self).save(*args, **kwargs)
+        thread = Thread.objects.get(id=self.id)
 
         tags = []
 
@@ -174,6 +202,9 @@ class Thread(models.Model):
                                                     title=title,
                                                     url=url,
                                                     read=False)
+
+        if not self.created_by == self.issue.assigned_to:
+            self.send_sms_notification(thread)
 
 
 class SmsNotification(models.Model):

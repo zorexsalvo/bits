@@ -45,7 +45,7 @@
                                 </div>
 
                                 <div class="box-body table-responsive no-padding">
-                                    <table class="table table-bordered table-hover">
+                                    <table class="table table-striped table-hover">
                                         <thead>
                                             <tr>
                                                 <th>Timestamp</th>
@@ -65,7 +65,21 @@
                                                 <td>{{ issue }}</td>
                                                 <td>{{ issue.tracker.company }}</td>
                                                 <td>{{ issue.tracker }}</td>
-                                                <td>{{ issue.priority }}</td>
+                                                <td>
+                                                    {% if issue.priority %}
+                                                        {% if issue.priority == 'LOW' %}
+                                                            <span class="badge">
+                                                        {% elif issue.priority == 'NORMAL' %}
+                                                            <span class="badge bg-green">
+                                                        {% elif issue.priority == 'HIGH' %}
+                                                            <span class="badge bg-yellow">
+                                                        {% else %}
+                                                            <span class="badge bg-red">
+                                                        {% endif %}
+                                                            {{ issue.priority }}
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                             {% empty %}
                                             <td>No issues found.</td>
@@ -96,6 +110,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="progressButton" class="btn btn-success">View Progress</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
@@ -121,6 +136,13 @@
 
                 $("#decisionModal").modal('show');
             });
+        </script>
+        <script>
+            document.getElementById("progressButton").onclick = function(event) {
+                event.preventDefault();
+                var issue_id = document.getElementById("id_issue_id");
+                window.location = "/issues/" + issue_id.value;
+            };
         </script>
     {% endblock js %}
 </body>

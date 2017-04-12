@@ -1,3 +1,10 @@
 #datepicker {
     background-color: white;
 }
+.lockscreen {
+    background-image: url('/static/img/bg.jpg');
+    background-size: cover;
+}
+#loginbody {
+    color: white;
+}
