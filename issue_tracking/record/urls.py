@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     url(r'login/user/$', UsernameLoginView.as_view(), name='username_login'),
-    url(r'login/$', LoginView.as_view(), name='login'),
+    url(r'^$', LoginView.as_view(), name='login'),
     url(r'logout/$', login_required(logout_view), name='logout'),
     url(r'notifications/(?P<notification_id>\d+)/$', notification_view, name='notification'),
     url(r'companies/create/$', login_required(CreateCompany.as_view()), name='create_company'),
