@@ -180,7 +180,7 @@ class CreateCompany(AdministratorView):
             name = form.cleaned_data.get('name')
             company = Company(name=name)
             company.save()
-            messages.success(request, 'Company has created successfully!')
+            messages.success(request, 'Company has been created successfully!')
             return HttpResponseRedirect(url)
         else:
             messages.warning(request, 'Company already exists.')
