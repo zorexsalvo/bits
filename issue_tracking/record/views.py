@@ -1,6 +1,6 @@
 import time
 from django.contrib.auth.models import User as AuthUser
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -642,6 +642,61 @@ class AdminThreadView(AdministratorView):
             return HttpResponseRedirect(url)
 
         return render(request, self.template_name, context)
+
+class AdministratorSettings(AdministratorView):
+    template_name = 'administrator/settings.html'
+    account_form_class = ChangePasswordForm
+    update_form_class = UpdateUserForm
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        user = User.objects.get(username=self.request.user)
+        context['account_form'] = self.account_form_class()
+        context['update_form'] = self.update_form_class(instance=user)
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        url = reverse('settings')
+        context = self.get_context(request)
+        user = User.objects.get(username=self.request.user)
+        account_form = self.account_form_class(request.POST or None)
+        update_form = self.update_form_class(request.POST or None, request.FILES or None, instance=user)
+        context['account_form'] = account_form
+        context['update_form'] = update_form
+
+        if account_form.is_valid():
+            data = account_form.cleaned_data
+            user = authenticate(username=self.request.user.username, password=data.get('old_password'))
+
+            if user is not None:
+                user.set_password(data.get('new_password'))
+                user.save()
+                return HttpResponseRedirect(url)
+            else:
+                messages.warning(request, 'Password change was unsuccessful!')
+
+        if update_form.is_valid():
+            data = update_form.cleaned_data
+            user = User.objects.get(username=self.request.user)
+            user.first_name = data.get('first_name')
+            user.middle_name = data.get('middle_name')
+            user.last_name = data.get('last_name')
+            user.sex = data.get('sex')
+            user.date_of_birth = data.get('date_of_birth')
+            user.mobile_number = data.get('mobile_number')
+            user.company = data.get('company')
+            user.position = data.get('position')
+            user.picture = data.get('picture')
+            user.color = data.get('color')
+            user.save()
+            messages.success(request, 'Profile has been updated successfully.')
+            return HttpResponseRedirect(url)
+        elif update_form.is_invalid():
+            messages.warning(request, 'Update is not successful.')
+            return HttpResponseRedirect(url)
+
+        return render(request, self.template_name, context)
+
 
 # EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES
 
