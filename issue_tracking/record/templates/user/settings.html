@@ -1,0 +1,166 @@
+{% extends 'user/base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<body class="hold-transition skin-purple sidebar-mini fixed">
+    <div class="wrapper">
+
+        <header class="main-header">
+            {% include 'user/header.html' %}
+        </header>
+
+        <aside class="main-sidebar">
+            {% include 'user/navigation.html' with active_tab='settings' %}
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>
+                    Settings
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li class="active">Settings</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                <div class="row">
+
+                    <div class="col-xs-12">
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <i class="icon fa fa-{% if message.tags == 'success' %}check{% else %}{{ message.tags }}{% endif %}"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="box">
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                <li class="active"><a href="#profile" data-toggle="tab">Profile Settings</a></li>
+                                <li><a href="#account" data-toggle="tab">Account Settings</a></li>
+                                </ul>
+                                <div class="tab-content">
+
+                                <div class="tab-pane active" id="profile">
+                                    <form role="form" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="box-body">
+                                            <div class="box box-solid">
+                                                {{ update_form.username }} {{ update_form.type }}
+                                               <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label>First Name</label> {{ update_form.first_name }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Middle Name</label> {{ update_form.middle_name }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Last Name</label> {{ update_form.last_name }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Sex</label> {{ update_form.sex }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Date of Birth</label>
+                                                        <div class="input-group date">
+                                                            <div class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </div>
+                                                            {{ update_form.date_of_birth }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Mobile Number</label>
+                                                        <div class="input-group date">
+                                                            <div class="input-group-addon">
+                                                                <i class="fa fa-mobile"></i>
+                                                            </div>
+                                                            {{ update_form.mobile_number }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Photo</label> {{ update_form.picture }}
+                                                    </div>
+                                                    {{ update_form.color }}
+                                                </div>
+                                            </div>
+
+                                            <div class="box box-solid" hidden>
+                                                <div class="box-header with-border">
+                                                    <h4 class="box-title">Employement Details</h4>
+                                                </div>
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label>Company</label> {{ update_form.company }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Position</label> {{ update_form.position }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                        <div class="box-footer">
+                                            <button type="submit" value="Update" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="tab-pane" id="account">
+                                    <div class="row">
+                                        <br />
+                                        <div class="col-md-3"></div>
+                                        <div class="col-md-6 col-xs-12">
+                                        <div class="callout callout-warning">
+                                            <h4>Change Password!</h4>
+                                            <p>You need to re-login after a successful password reset.</p>
+                                        </div>
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            {% if account_form %}
+                                                {{ account_form.as_p }}
+                                            {% endif %}
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </form>
+                                        </div>
+                                        <div class="col-md-3"></div>
+                                    </div>
+                                    <br />
+                                </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        {% block footer %}
+            {{ block.super }}
+        {% endblock footer %}
+
+        {% block js %}
+            {{ block.super }}
+            <script src="{% static 'plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+            <script>
+                //Date picker
+                $('#datepicker').datepicker({
+                autoclose: true
+                });
+            </script>
+            <script>
+                $('#id_color').paletteColorPicker({
+                    clear_btn: 'last'
+                });
+            </script>
+        {% endblock js %}
+</body>
+{% endblock content %}
