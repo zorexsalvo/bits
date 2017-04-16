@@ -77,12 +77,13 @@ class UsernameLoginView(TemplateView):
             'ADMINISTRATOR': 'admin_dashboard'
         }
 
+        logo = Utility.objects.first()
         form = self.form_class()
         if request.user.is_authenticated():
             user = User.objects.get(username=request.user)
             url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'logo': logo})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -100,6 +101,7 @@ class LoginView(TemplateView):
     def get(self, request, *args, **kwargs):
         user = User.objects.filter(username__username=request.GET.get('username')).first()
         img_url = None
+        logo = Utility.objects.first()
 
         form = self.form_class({'username': request.GET.get('username')})
 
@@ -116,7 +118,7 @@ class LoginView(TemplateView):
             user = User.objects.get(username=request.user)
             url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form, 'user': user})
+        return render(request, self.template_name, {'form': form, 'user': user, 'logo': logo})
 
     def post(self, request, *args, **kwargs):
         redirect_map = {
@@ -647,22 +649,30 @@ class AdministratorSettings(AdministratorView):
     template_name = 'administrator/settings.html'
     account_form_class = ChangePasswordForm
     update_form_class = UpdateUserForm
+    logo_form_class = LogoForm
 
     def get(self, request, *args, **kwargs):
         context = self.get_context(request)
         user = User.objects.get(username=self.request.user)
+        logo = Utility.objects.first()
         context['account_form'] = self.account_form_class()
         context['update_form'] = self.update_form_class(instance=user)
+        context['logo_form'] = self.logo_form_class(instance=logo)
+        context['logo'] = logo
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         url = reverse('settings')
         context = self.get_context(request)
         user = User.objects.get(username=self.request.user)
+        logo = Utility.objects.first()
         account_form = self.account_form_class(request.POST or None)
+        logo_form = self.logo_form_class(request.POST or None, request.FILES or None, instance=logo)
         update_form = self.update_form_class(request.POST or None, request.FILES or None, instance=user)
         context['account_form'] = account_form
         context['update_form'] = update_form
+        context['logo_form'] = logo_form
+        context['logo'] = logo
 
         if account_form.is_valid():
             data = account_form.cleaned_data
@@ -692,9 +702,21 @@ class AdministratorSettings(AdministratorView):
             user.save()
             messages.success(request, 'Profile has been updated successfully.')
             return HttpResponseRedirect(url)
-        elif not update_form.is_valid():
-            messages.warning(request, 'Update is not successful.')
+
+        if logo_form.is_valid():
+            data = logo_form.cleaned_data
+            if logo is not None:
+                logo.logo = data.get('logo')
+            else:
+                logo = Utility(logo=data.get('logo'))
+            logo.save()
+            messages.success(request, 'The logo has been updated successfully.')
             return HttpResponseRedirect(url)
+
+        else:
+            messages.warning(request, 'Update is not successful!')
+            return HttpResponseRedirect(url)
+
         return render(request, self.template_name, context)
 
 

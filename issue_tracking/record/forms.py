@@ -233,3 +233,9 @@ class DecisionForm(forms.Form):
 
 class SearchForm(forms.Form):
     q = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control pull-right', 'name': 'table_search'}))
+
+
+class LogoForm(forms.ModelForm):
+    class Meta:
+        model = Utility
+        fields = ['logo',]

@@ -5,7 +5,11 @@
     <div class="lockscreen-wrapper">
 
         <div class="lockscreen-logo">
+            {% if logo.logo.url %}
+            <img src="{{ logo.logo.url }}" alt="Logo Image" style="width:150">
+            {% else %}
             <img src="/media/images/bits.logo.png" alt="Logo Image" style="width:150">
+            {% endif %}
         </div>
 
         <div class="lockscreen-name"></div>

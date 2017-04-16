@@ -220,3 +220,6 @@ class SmsNotification(models.Model):
 
 class Utility(models.Model):
     logo = models.ImageField(upload_to='images')
+
+    class Meta:
+        verbose_name_plural = 'Utilities'

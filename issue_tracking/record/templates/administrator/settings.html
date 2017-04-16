@@ -135,7 +135,19 @@
                                 </div>
 
                                 <div class="tab-pane" id="application">
+                                    {% if logo.logo.url %}
+                                    <img src="{{ logo.logo.url }}" alt="Logo Image">
+                                    {% else %}
+                                    <img src="/media/images/bits.logo.png" alt="Logo Image">
+                                    {% endif %}
+                                    <form method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        {{ logo_form.logo }}<br />
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </form>
+
                                 </div>
+
                                 </div>
                             </div>
 
