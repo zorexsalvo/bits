@@ -674,6 +674,7 @@ class AdministratorSettings(AdministratorView):
                 return HttpResponseRedirect(url)
             else:
                 messages.warning(request, 'Password change was unsuccessful!')
+                return HttpResponseRedirect(url)
 
         if update_form.is_valid():
             data = update_form.cleaned_data
@@ -691,10 +692,9 @@ class AdministratorSettings(AdministratorView):
             user.save()
             messages.success(request, 'Profile has been updated successfully.')
             return HttpResponseRedirect(url)
-        elif update_form.is_invalid():
+        elif not update_form.is_valid():
             messages.warning(request, 'Update is not successful.')
             return HttpResponseRedirect(url)
-
         return render(request, self.template_name, context)
 
 
