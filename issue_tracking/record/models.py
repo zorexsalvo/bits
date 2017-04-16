@@ -216,3 +216,7 @@ class SmsNotification(models.Model):
     sms = models.TextField()
     priority = models.CharField(max_length=200, choices=PRIORITY)
     active = models.BooleanField()
+
+
+class Utility(models.Model):
+    logo = models.ImageField(upload_to='images')
