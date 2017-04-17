@@ -1,3 +1,5 @@
+from colour import Color
+
 from django import template
 from django.utils import timezone
 
@@ -12,6 +14,20 @@ def getcolor(string):
     try:
         index = string.index('|')
         return string[index+1:]
+    except:
+        return ''
+
+@register.filter
+def getfontcolor(string):
+    try:
+        index = string.index('|')
+        hex = string[index+1:]
+        color = Color(hex)
+
+        if color.luminance < 0.5:
+            return 'white'
+        else:
+            return 'black'
     except:
         return ''
 
