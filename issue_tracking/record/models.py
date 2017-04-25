@@ -72,6 +72,9 @@ class User(models.Model):
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
+    class Meta:
+        unique_together = ('company', 'color')
+
 
 class Notification(models.Model):
     CATEGORY = (('ISSUE', 'Issue'),
