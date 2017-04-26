@@ -192,6 +192,15 @@ class Thread(models.Model):
                                         url=url,
                                         read=False)
 
+        if not self.created_by == self.assigned_to:
+            title = '{} assigned you in an issue.'.format(self.created_by)
+
+            Notification.objects.create(user=self.assigned_to,
+                                        category='ISSUE',
+                                        title=title,
+                                        url=url,
+                                        read=False)
+
             for tag in self.note.split():
                 if '@' in tag:
                     print(tag)
