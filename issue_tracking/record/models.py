@@ -72,6 +72,9 @@ class User(models.Model):
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
+    class Meta:
+        unique_together = ('company', 'color')
+
 
 class Notification(models.Model):
     CATEGORY = (('ISSUE', 'Issue'),
@@ -189,6 +192,15 @@ class Thread(models.Model):
                                         url=url,
                                         read=False)
 
+        if not self.created_by == self.assigned_to:
+            title = '{} assigned you in an issue.'.format(self.created_by)
+
+            Notification.objects.create(user=self.assigned_to,
+                                        category='ISSUE',
+                                        title=title,
+                                        url=url,
+                                        read=False)
+
             for tag in self.note.split():
                 if '@' in tag:
                     print(tag)
@@ -216,3 +228,10 @@ class SmsNotification(models.Model):
     sms = models.TextField()
     priority = models.CharField(max_length=200, choices=PRIORITY)
     active = models.BooleanField()
+
+
+class Utility(models.Model):
+    logo = models.ImageField(upload_to='images')
+
+    class Meta:
+        verbose_name_plural = 'Utilities'

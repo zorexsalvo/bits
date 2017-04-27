@@ -1,6 +1,6 @@
 import time
 from django.contrib.auth.models import User as AuthUser
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -77,20 +77,22 @@ class UsernameLoginView(TemplateView):
             'ADMINISTRATOR': 'admin_dashboard'
         }
 
+        logo = Utility.objects.first()
         form = self.form_class()
         if request.user.is_authenticated():
             user = User.objects.get(username=request.user)
             url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'logo': logo})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        logo = Utility.objects.first()
 
         if form.is_valid():
             url = self.build_url(reverse('login'), q={'username': form.cleaned_data['username']})
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'logo': logo})
 
 
 class LoginView(TemplateView):
@@ -100,6 +102,7 @@ class LoginView(TemplateView):
     def get(self, request, *args, **kwargs):
         user = User.objects.filter(username__username=request.GET.get('username')).first()
         img_url = None
+        logo = Utility.objects.first()
 
         form = self.form_class({'username': request.GET.get('username')})
 
@@ -116,7 +119,7 @@ class LoginView(TemplateView):
             user = User.objects.get(username=request.user)
             url = reverse(redirect_map[user.type])
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form, 'user': user})
+        return render(request, self.template_name, {'form': form, 'user': user, 'logo': logo})
 
     def post(self, request, *args, **kwargs):
         redirect_map = {
@@ -126,6 +129,7 @@ class LoginView(TemplateView):
 
         username = request.GET.get('username')
         user = User.objects.filter(username__username=username).first()
+        logo = Utility.objects.first()
 
         if user is None:
             url = reverse('username_login')
@@ -137,7 +141,7 @@ class LoginView(TemplateView):
             user = form.login(request)
             _login = login(request, user)
             return HttpResponseRedirect(url)
-        return render(request, self.template_name, {'form': form, 'user':user})
+        return render(request, self.template_name, {'form': form, 'user':user, 'logo': logo})
 
 
 class AdministratorView(HasRoleMixin, TemplateView):
@@ -180,7 +184,7 @@ class CreateCompany(AdministratorView):
             name = form.cleaned_data.get('name')
             company = Company(name=name)
             company.save()
-            messages.success(request, 'Company has created successfully!')
+            messages.success(request, 'Company has been created successfully!')
             return HttpResponseRedirect(url)
         else:
             messages.warning(request, 'Company already exists.')
@@ -643,6 +647,81 @@ class AdminThreadView(AdministratorView):
 
         return render(request, self.template_name, context)
 
+class AdministratorSettings(AdministratorView):
+    template_name = 'administrator/settings.html'
+    account_form_class = ChangePasswordForm
+    update_form_class = UpdateUserForm
+    logo_form_class = LogoForm
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        user = User.objects.get(username=self.request.user)
+        logo = Utility.objects.first()
+        context['account_form'] = self.account_form_class()
+        context['update_form'] = self.update_form_class(instance=user)
+        context['logo_form'] = self.logo_form_class(instance=logo)
+        context['logo'] = logo
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        url = reverse('settings')
+        context = self.get_context(request)
+        user = User.objects.get(username=self.request.user)
+        logo = Utility.objects.first()
+        account_form = self.account_form_class(request.POST or None)
+        logo_form = self.logo_form_class(request.POST or None, request.FILES or None, instance=logo)
+        update_form = self.update_form_class(request.POST or None, request.FILES or None, instance=user)
+        context['account_form'] = account_form
+        context['update_form'] = update_form
+        context['logo_form'] = logo_form
+        context['logo'] = logo
+
+        if account_form.is_valid():
+            data = account_form.cleaned_data
+            user = authenticate(username=self.request.user.username, password=data.get('old_password'))
+
+            if user is not None:
+                user.set_password(data.get('new_password'))
+                user.save()
+                return HttpResponseRedirect(url)
+            else:
+                messages.warning(request, 'Password change was unsuccessful!')
+                return HttpResponseRedirect(url)
+
+        if update_form.is_valid():
+            data = update_form.cleaned_data
+            user = User.objects.get(username=self.request.user)
+            user.first_name = data.get('first_name')
+            user.middle_name = data.get('middle_name')
+            user.last_name = data.get('last_name')
+            user.sex = data.get('sex')
+            user.date_of_birth = data.get('date_of_birth')
+            user.mobile_number = data.get('mobile_number')
+            user.company = data.get('company')
+            user.position = data.get('position')
+            user.picture = data.get('picture')
+            user.color = data.get('color')
+            user.save()
+            messages.success(request, 'Profile has been updated successfully.')
+            return HttpResponseRedirect(url)
+
+        if logo_form.is_valid():
+            data = logo_form.cleaned_data
+            if logo is not None:
+                logo.logo = data.get('logo')
+            else:
+                logo = Utility(logo=data.get('logo'))
+            logo.save()
+            messages.success(request, 'The logo has been updated successfully.')
+            return HttpResponseRedirect(url)
+
+        else:
+            messages.warning(request, 'Update is not successful!')
+            return HttpResponseRedirect(url)
+
+        return render(request, self.template_name, context)
+
+
 # EMPLOYEE VIEWS: MUST REFACTOR THESE TWO MODES
 
 class EmployeeView(HasRoleMixin, TemplateView):
@@ -833,6 +912,60 @@ class EmployeeArchiveView(EmployeeView):
             return HttpResponseRedirect(url + '?status={}&q={}'.format(status, q))
         return HttpResponseRedirect(url + '?status={}'.format(status))
 
+class EmployeeSettings(EmployeeView):
+    template_name = 'user/settings.html'
+    account_form_class = ChangePasswordForm
+    update_form_class = UpdateUserForm
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request)
+        user = User.objects.get(username=self.request.user)
+        context['account_form'] = self.account_form_class()
+        context['update_form'] = self.update_form_class(instance=user)
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        url = reverse('employee_settings')
+        context = self.get_context(request)
+        user = User.objects.get(username=self.request.user)
+        logo = Utility.objects.first()
+        account_form = self.account_form_class(request.POST or None)
+        update_form = self.update_form_class(request.POST or None, request.FILES or None, instance=user)
+        context['account_form'] = account_form
+        context['update_form'] = update_form
+
+        if account_form.is_valid():
+            data = account_form.cleaned_data
+            user = authenticate(username=self.request.user.username, password=data.get('old_password'))
+
+            if user is not None:
+                user.set_password(data.get('new_password'))
+                user.save()
+                return HttpResponseRedirect(url)
+            else:
+                messages.warning(request, 'Password change was unsuccessful!')
+                return HttpResponseRedirect(url)
+
+        if update_form.is_valid():
+            data = update_form.cleaned_data
+            user = User.objects.get(username=self.request.user)
+            user.first_name = data.get('first_name')
+            user.middle_name = data.get('middle_name')
+            user.last_name = data.get('last_name')
+            user.sex = data.get('sex')
+            user.date_of_birth = data.get('date_of_birth')
+            user.mobile_number = data.get('mobile_number')
+            user.company = data.get('company')
+            user.position = data.get('position')
+            user.picture = data.get('picture')
+            user.color = data.get('color')
+            user.save()
+            messages.success(request, 'Profile has been updated successfully.')
+            return HttpResponseRedirect(url)
+
+        else:
+            messages.warning(request, 'Update is unsuccessful.')
+            return HttpResponseRedirect(url)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SMSView(View):

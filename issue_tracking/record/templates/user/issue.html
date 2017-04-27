@@ -82,7 +82,11 @@
                                             <tr>
                                                 <td>{{ issue }}</td>
                                                 {% for comment in comments %}
-                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog" data-toggle="tooltip" data-container="body" title="{{ comment|getmessage }}">{{ comment|getmessage|minimizestring }}</td>                                                {% endfor %}
+                                                <td style="background-color:{{ comment|getcolor }};" class="open-RespondDialog" data-toggle="tooltip" data-container="body" title="{{ comment|getmessage }}">
+                                                    <div style="color: {{ comment|getfontcolor }};">
+                                                        {{ comment|getmessage|minimizestring }}</td>
+                                                    </div>
+                                                {% endfor %}
                                             </tr>
                                             {% empty %}
                                             <tr>

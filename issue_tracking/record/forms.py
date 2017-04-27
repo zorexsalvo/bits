@@ -38,6 +38,11 @@ class LoginForm(forms.Form):
         fields = ['username', 'password']
 
 
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Old Password', 'class': 'form-control'}))
+    new_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'New Password', 'class': 'form-control'}))
+
+
 class CompanyForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter company name', 'class': 'form-control'}))
 
@@ -228,3 +233,9 @@ class DecisionForm(forms.Form):
 
 class SearchForm(forms.Form):
     q = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control pull-right', 'name': 'table_search'}))
+
+
+class LogoForm(forms.ModelForm):
+    class Meta:
+        model = Utility
+        fields = ['logo',]
